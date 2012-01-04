@@ -1,0 +1,11 @@
+Include:
+
+"K:\DirectX_SDK_March 2008\Include";J:\TheFly\Include
+
+Lib:
+
+"K:\DirectX_SDK_March 2008\Lib\x86";J:\TheFly\Lib
+
+Link:
+
+d3d9.lib d3dx9.lib dsound.lib dxguid.lib winmm.lib dinput8.lib TheFlyLib.lib
