@@ -268,8 +268,6 @@ void RenderFunc(int skip)
 
 	FnViewport vp2;
 	vp2.Object(vID2);
-	vp2.SetFogMode(LINEAR_FOG);
-	vp2.SetLinearFogRange(1000, 8000);
 	vp2.Render(minimap_cID, TRUE, TRUE);
 
 	FnWorld gw;
