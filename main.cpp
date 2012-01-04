@@ -4,6 +4,7 @@
 #include "Lyubu.h"
 
 #include <queue>
+#include <vector>
 
 using namespace std;
 
@@ -45,7 +46,9 @@ float maxDistance = 700.0f, Distance;
 
 void Keydown(WORLDid, BYTE, BOOL);
 void RenderFunc(int);
-void GameAI(int);
+void GameAI(int skip);
+
+vector<NPC *> NPCs;
 
 void attack_test(FnActor attacker, FnActor defender, int att_dis);
 
@@ -142,11 +145,10 @@ int main(int argc, char **argv)
 	lyubu->Object(lyubuID);
 	lyubu->init();
 
-	//blood.SetParent(lyubu->GetBaseObject());
-
 
 	// Load Donzo
 	DonzoID = scene.LoadActor("Donzo");
+	NPCs.push_back(&Donzo);
 	Donzo.init(DonzoID, 0);
 
 	float pos[3] = {3569.0f, -3208.0f, 0.f};
@@ -218,17 +220,28 @@ void GameAI(int skip)
 	{
 		AttackEvent ae = AttackList.front();
 		AttackList.pop();
-		if(!Donzo.Isdead())
+		int i, num = NPCs.size();
+		for(i=0;i<num;i++)
 		{
 			float start[3], pos[3], attdir[3], tmp[3], dis[3];
-			lyubu->GetPosition(start);
-			Donzo.GetPosition(pos);
-			lyubu->GetDirection(attdir, tmp);
-			FVector::Minus(pos, start, dis);
-			FVector::Project(dis, attdir, tmp);
-			float angle = FVector::Angle(attdir, dis);
-			if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
-				Donzo.changeState(hitted,1);
+			ae.actor->GetPosition(start);
+			//lyubu->GetPosition(start);
+
+			NPC *npc;
+			npc = NPCs[i];
+			if(!npc->Isdead())
+			{
+				npc->GetPosition(pos);
+				//Donzo.GetPosition(pos);
+				ae.actor->GetDirection(attdir, tmp);
+				FVector::Minus(pos, start, dis);
+				FVector::Project(dis, attdir, tmp);
+				float angle = FVector::Angle(attdir, dis);
+				if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
+				{
+					npc->changeState(hitted,ae.damage);
+				}
+			}
 		}
 	}
 	FnCamera camera;

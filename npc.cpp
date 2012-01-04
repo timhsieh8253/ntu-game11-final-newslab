@@ -34,7 +34,7 @@ bool NPC::init(OBJECTid id, int actorType)
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
 	
-	size[0] = 25.0f;
+	size[0] = 3.0f*life;
 	size[1] = 5.0f;
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
 	
@@ -147,6 +147,7 @@ void NPC::playAction(int skip){
 void NPC::fsm(int skip) {
 
 	playAction(skip);
+	FnBillBoard bb;
 
 	switch(this->state){
 
@@ -166,7 +167,14 @@ void NPC::fsm(int skip) {
 
 		case hitted:
 
-			if(curActID != damageID && curActID != defanceID) life--;
+			if(curActID != damageID && curActID != defanceID) life-=hitLevel;
+
+			
+			bb.Object(this->bloodID, this->blood_billboardID);
+			float size[2];
+			size[0] = 3.0f*life;
+			size[1] = 5.0f;
+			bb.SetSize(size);
 
 			if(life <= 0)
 			{

@@ -215,16 +215,25 @@ void Lyubu::MakeAction()
 		
 			AttackEvent ae;
 			ae.actor = this;
-			if(curAttID == nAtt1ID || curAttID == nAtt4ID)
+			if(curAttID == nAtt1ID)
 			{
 				ae.length = 150;
 				ae.width = 30;
+				ae.damage = 1;
+			}
+			else if(curAttID == nAtt4ID)
+			{
+				ae.length = 150;
+				ae.width = 30;
+				ae.damage = 4;
 			}
 			else
 			{
 				ae.length = 150;
 				ae.width = 150;
+				ae.damage = 2;
 			}
+			
 
 			AttackList.push(ae);
 
