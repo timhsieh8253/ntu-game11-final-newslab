@@ -1,10 +1,14 @@
+ArrowU.dds 要移到 ntu4/characters 下，小地圖才會有箭頭
+
 Include:
 
-"K:\DirectX_SDK_March 2008\Include";J:\TheFly\Include
+DirectX_SDK\Include;TheFly\Include
+
 
 Lib:
 
-"K:\DirectX_SDK_March 2008\Lib\x86";J:\TheFly\Lib
+DirectX_SDK\Lib\x86";TheFly\Lib
+
 
 Link:
 
