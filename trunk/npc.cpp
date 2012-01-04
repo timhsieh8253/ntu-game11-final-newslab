@@ -18,7 +18,7 @@ bool NPC::init(OBJECTid id, int actorType)
 	nextActID = idleID;
 	MakeCurrentAction(0, NULL, idleID);
 	flag = TRUE;
-	life = 10;
+	life = 20;
 	hitLevel = 0;
 
 	// create blood bar

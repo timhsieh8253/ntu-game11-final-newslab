@@ -60,9 +60,9 @@ void Lyubu::init()
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
 	
-	size[0] = 25.0f;
+	size[0] = 80.0f;
 	size[1] = 5.0f;
-	pos[0]-=fullblood-size[0];
+	//pos[0]-=fullblood-size[0];
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
 	
 	blood_billboardID = blood.Billboard(pos, size, NULL, 0, color);
