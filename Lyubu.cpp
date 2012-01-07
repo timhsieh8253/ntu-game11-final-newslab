@@ -69,6 +69,8 @@ void Lyubu::init()
 	
 }
 
+
+
 void Lyubu::changeState(BYTE code, BOOL value)
 {
 	if(state.contain(LYUBU_ATT))
