@@ -1,4 +1,6 @@
 #include "TheFlyWin32.h"
+#include "FyFX.h"
+#include "FyMedia.h"
 #include "utils.h"
 #include "npc.h"
 #include "Lyubu.h"
@@ -6,19 +8,8 @@
 #include <queue>
 #include <vector>
 
+
 using namespace std;
-
-#define STATE_IDLE	0
-#define STATE_W		1
-#define STATE_A		2
-#define STATE_S		4
-#define STATE_D		8
-#define STATE_ATT1	16
-#define STATE_ATT2	32
-#define STATE_ATT3	64
-#define STATE_ATT4	128
-
-
 
 WORLDid gID;
 VIEWPORTid vID, vID2;
@@ -26,6 +17,8 @@ SCENEid sID;
 OBJECTid cID, tID, lID, lyubuID, minimap_cID, arrowID;
 int billboardID;
 ACTIONid curActID, idleID, runID, att1ID, att2ID, att3ID, att4ID;
+eF3DFX *fx00;//FX
+eF3DBaseFX *fx;
 
 NPC Donzo;
 Lyubu *lyubu;
@@ -58,6 +51,14 @@ queue<AttackEvent> AttackList;
 
 int main(int argc, char **argv)
 {
+	/*AllocConsole() ;
+    HANDLE hd = GetStdHandle(STD_OUTPUT_HANDLE) ;
+	wchar_t *pBuf;
+	pBuf=(wchar_t *)GlobalLock(GlobalAlloc(GMEM_MOVEABLE|GMEM_ZEROINIT,200));
+	wsprintf(pBuf,L"123\n");
+    WriteConsole(hd ,pBuf,wcslen(pBuf), NULL , NULL );
+    CloseHandle(hd) ;*/
+
 	// Create a new World
 	FnWorld gw;
 	gID = FyWin32CreateWorld("Game Programming HW3", 0, 0, 800, 600, 32, FALSE);
@@ -129,6 +130,7 @@ int main(int argc, char **argv)
 	terrain.Load("terrain");
 	terrain.GenerateTerrainData();
 
+
 	//terrain.Show(TRUE);
 	
 	// Reset path
@@ -147,7 +149,6 @@ int main(int argc, char **argv)
 	lyubu->Object(lyubuID);
 	lyubu->init();
 
-
 	// Load Donzo
 	DonzoID = scene.LoadActor("Donzo");
 	NPCs.push_back(&Donzo);
@@ -164,7 +165,22 @@ int main(int argc, char **argv)
 	// Default Action is Idle
 	Donzo.setNPCurAction(idle, "CombatIdle");
 	Donzo.Play(0, START, 0.0f, FALSE, TRUE);
+
+	//FX
+	fx00 = new eF3DFX(sID);
+	fx00->SetWorkPath("NTU4\\FXs");
+	fx00->Load("NoPigeon1");
 	
+	//pos[0] = 0.f;
+	//pos[1] = 0.f;
+	pos[2] = 100.f;
+	for(int i=0; i<fx00->NumberFXs(); i++)
+	{
+		fx = fx00->GetFX(i);
+		//fx->SetParent(lyubu->GetBaseObject());
+		fx->InitPosition(pos);
+	}
+
 	// Room
 	OBJECTid roomID = scene.CreateRoom(COLLISION_ROOM, 100);
 	FnRoom room;
@@ -224,6 +240,7 @@ int main(int argc, char **argv)
 
 void GameAI(int skip)
 {
+	printf("game AI\n");
 	(lyubu->*(lyubu->nextFrame))(skip); // 很複雜的 Function 指標 囧 不過可以省下 if else
 	Donzo.fsm(skip);
 
@@ -262,8 +279,8 @@ void GameAI(int skip)
 	lyubu->GetPosition(pos);
 	pos[2] = 5000;
 	camera.SetPosition(pos);
-	
-
+	if(!fx00->Play((float) skip))
+		fx00->Reset();
 	return ;
 }
 
