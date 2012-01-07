@@ -44,6 +44,8 @@ float turn_target = 0.0f, angle;
 float minHeight = 400.0f, Height;
 float maxDistance = 700.0f, Distance;
 
+void NPCKeydown(WORLDid, BYTE, BOOL);
+void NPCKeydownAttack(WORLDid gID, BYTE code, BOOL value);
 void Keydown(WORLDid, BYTE, BOOL);
 void RenderFunc(int);
 void GameAI(int skip);
@@ -147,9 +149,9 @@ int main(int argc, char **argv)
 
 
 	// Load Donzo
-	DonzoID = scene.LoadActor("Donzo");
+	DonzoID = scene.LoadActor("Robber02");
 	NPCs.push_back(&Donzo);
-	Donzo.init(DonzoID, 0);
+	Donzo.init(DonzoID, 1, cID);
 
 	float pos[3] = {3569.0f, -3208.0f, 0.f};
 	pos[0] = 3800.0f;
@@ -200,6 +202,16 @@ int main(int argc, char **argv)
 	FyDefineHotKey(FY_K, Keydown, FALSE);
 	FyDefineHotKey(FY_L, Keydown, FALSE);
 	FyDefineHotKey(FY_I, Keydown, FALSE);
+
+	FyDefineHotKey(FY_T, NPCKeydown, FALSE);
+	FyDefineHotKey(FY_F, NPCKeydown, FALSE);
+	FyDefineHotKey(FY_G, NPCKeydown, FALSE);
+	FyDefineHotKey(FY_H, NPCKeydown, FALSE);
+
+	FyDefineHotKey(FY_1, NPCKeydownAttack, FALSE);
+	FyDefineHotKey(FY_2, NPCKeydownAttack, FALSE);
+	FyDefineHotKey(FY_3, NPCKeydownAttack, FALSE);
+	FyDefineHotKey(FY_4, NPCKeydownAttack, FALSE);
 
 	/* bind a timer, frame rate = 30 fps */
 	FyBindTimer(0, 30.0f, RenderFunc, TRUE);
@@ -255,6 +267,19 @@ void GameAI(int skip)
 	return ;
 }
 
+void NPCKeydown(WORLDid gID, BYTE code, BOOL value)
+{
+	Donzo.changeRunState(code,value);
+	if(Donzo.getState() != 4)
+		Donzo.changeState(follow,0);
+}
+
+void NPCKeydownAttack(WORLDid gID, BYTE code, BOOL value)
+{
+	Donzo.changeAttackState(code,value);
+}
+
+
 void Keydown(WORLDid gID, BYTE code, BOOL value)
 {
 	lyubu->changeState(code, value);
@@ -298,6 +323,10 @@ void RenderFunc(int skip)
 
 	sprintf(msg, "NPC: state = %d, life = %d, curaction = %d", Donzo.getState(), Donzo.getlife(), Donzo.getcurAction());
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);*/
+
+	sprintf(msg, "npc: %d  State:%d  Life = %d", Donzo.getTest(), Donzo.getState(), Donzo.getlife());
+	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
+
 	float output[2], input[3];
 	Donzo.GetPosition(input);
 	/*if(vp.ComputeScreenPosition(cID, output, input, PHYSICAL_SCREEN, FALSE))
