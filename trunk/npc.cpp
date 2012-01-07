@@ -1,6 +1,9 @@
 #include "TheFlyWin32.h"
 #include "npc.h"
+#include "Lyubu.h"
 #include "utils.h"
+
+extern Lyubu *lyubu; // 把呂布拿來用
 
 /********************************************************************/
 // 初始化 (actor = 0 董卓 , actor = 1 小兵)
@@ -203,25 +206,53 @@ void NPC::fsm(int skip) {
 	playAction(skip);
 	FnBillBoard bb;
 
+	float lyubu_pos[3], pos[3];
+	this->GetPosition(pos);
+	lyubu->GetPosition(lyubu_pos);
+
+	float follow_dis = 1000;
+	float attack_dis = 100;
+
 	switch(this->state){
 
 		case wait:
 		{
+			//檢查和呂布的距離，小於限制就變 follow
+			float dis = FVector::ComputeDistance(lyubu_pos, pos);
+			if(dis < attack_dis)
+				this->changeState(attackPlayer, 1);
+			else if(dis < follow_dis)
+				this->changeState(follow, 0);
 			setNPCurAction(idle,"");
+
 			break;
 		}
 
 		case follow:
 		{
-			  if(runState.contain(NPC_UP) || runState.contain(NPC_DOWN) 
+			  /*if(runState.contain(NPC_UP) || runState.contain(NPC_DOWN) 
 				 || runState.contain(NPC_LEFT) || runState.contain(NPC_RIGHT) )
 			  {
 				test = 2;
 				setNPCurAction(run,"");
 				turn();
 				MoveForward(5, TRUE, TRUE, 0, TRUE);
-			  }
-			  else changeState(wait,0);
+			  }*/
+
+			float dis = FVector::ComputeDistance(lyubu_pos, pos);
+			if(dis < attack_dis)
+				this->changeState(attackPlayer, 1);
+			else if(dis >= follow_dis)
+				this->changeState(wait, 0);
+
+			setNPCurAction(run,"");
+			// 計算方向
+			float dir[3];
+			FVector::Minus(lyubu_pos, pos, dir);
+			float udir[3], fdir[3];
+			this->GetDirection(fdir, udir);
+			this->SetDirection(dir, udir);
+			this->MoveForward(5, TRUE, TRUE, 0, TRUE);
 
 			break;
 		}

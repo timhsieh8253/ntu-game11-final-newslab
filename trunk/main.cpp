@@ -240,7 +240,6 @@ int main(int argc, char **argv)
 
 void GameAI(int skip)
 {
-	printf("game AI\n");
 	(lyubu->*(lyubu->nextFrame))(skip); // 很複雜的 Function 指標 囧 不過可以省下 if else
 	Donzo.fsm(skip);
 
