@@ -23,7 +23,7 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 	nextActID = idleID;
 	MakeCurrentAction(0, NULL, idleID);
 	flag = TRUE;
-	life = 100;
+	life = 20;
 	hitLevel = 0;
 	attackLevel = 0;
 	hitNum = 0;

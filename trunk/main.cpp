@@ -149,9 +149,9 @@ int main(int argc, char **argv)
 
 
 	// Load Donzo
-	DonzoID = scene.LoadActor("Robber02");
+	DonzoID = scene.LoadActor("Donzo");
 	NPCs.push_back(&Donzo);
-	Donzo.init(DonzoID, 1, cID);
+	Donzo.init(DonzoID, 0, cID);
 
 	float pos[3] = {3569.0f, -3208.0f, 0.f};
 	pos[0] = 3800.0f;
