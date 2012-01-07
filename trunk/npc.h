@@ -1,32 +1,53 @@
+#include "utils.h"
 
 enum Action   {idle, run, right, left, attack, damage, defance, dead};
 enum NPCState {wait, follow, attackPlayer, escape, hitted, die};
+
+#define NPC_IDLE		0
+#define NPC_UP			1
+#define NPC_LEFT		2
+#define NPC_DOWN		4
+#define NPC_RIGHT		8
+#define NPC_ATT			16
 
 class NPC : public FnActor{
 public:
 
 	NPC();
 	~NPC(); 
-	bool init(OBJECTid id, int actorType);
+	bool init(OBJECTid id, int actorType, OBJECTid cameraid);
 
 	void setNPCActionID();
 	void setNPCurAction(int action, char *ActionName);
-	void changeState(int newState, int hitLevel);
+	void changeState(int newState, int Level);
 	void playAction(int skip);
 	void fsm(int skip);
 	void decreaseLife(int value);
 	int  getlife();
 	int  getcurAction();
 	int  getState();
+	int  getHitNum();
+	int  getTest();
+
+
 	OBJECTid getid();
 	bool Isdead();
 
+	void changeRunState(BYTE code, BOOL value);
+	void changeAttackState(BYTE code, BOOL value);
+	void MakeAction();
+	void turn();
+
+
 private:
 
-	OBJECTid npc_id;
+	OBJECTid npc_id, cameraID;
 	ACTIONid curActID, nextActID;
 	ACTIONid idleID,   runID,    rightID,   leftID;
 	ACTIONid attackID, damageID, defanceID, deadID;
+	State    runState, nextRunState;
+	float face_NPC;
+
 
 	// blood bar
 	int blood_billboardID;
@@ -37,6 +58,9 @@ private:
 	int	      actor;
 	int	      life;
 	BOOL	  flag;
-	int		  hitLevel;
+	int		  hitLevel, attackLevel;
+	int		  hitNum;
+
+	int		  test;
 
 };
