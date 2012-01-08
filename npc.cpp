@@ -10,7 +10,7 @@
 using namespace std;
 
 extern Lyubu *lyubu; // 把呂布拿來用
-extern queue<AttackEvent> AttackList;
+extern MyAttackQueue AttackList;
 
 /********************************************************************/
 // 初始化 (actor = 0 董卓 , actor = 1 小兵)
@@ -248,6 +248,7 @@ void NPC::fsm(int skip) {
 					ae.length = 150;
 					ae.width = 50;
 					ae.damage = 2;
+					ae.delay = 15;
 					AttackList.push(ae);
 				}
 			}
@@ -281,6 +282,7 @@ void NPC::fsm(int skip) {
 					ae.length = 150;
 					ae.width = 50;
 					ae.damage = 2;
+					ae.delay = 15;
 					AttackList.push(ae);
 				}
 			}

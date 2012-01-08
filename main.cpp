@@ -47,7 +47,7 @@ vector<NPC *> NPCs;
 
 void attack_test(FnActor attacker, FnActor defender, int att_dis);
 
-queue<AttackEvent> AttackList;
+MyAttackQueue AttackList;
 
 int main(int argc, char **argv)
 {
@@ -244,40 +244,50 @@ void GameAI(int skip)
 {
 	(lyubu->*(lyubu->nextFrame))(skip); // 很複雜的 Function 指標 囧 不過可以省下 if else
 	Donzo.fsm(skip);
+	AttackList.reduceDelay(skip);
 
-	// 目前一次只處理一個 AttackEvent
 	if(AttackList.size()>0)
 	{
 		AttackEvent ae = AttackList.front();
-		AttackList.pop();
-		if(ae.actor == lyubu)
+		if(ae.delay < 0)
 		{
-			int i, num = NPCs.size();
-			for(i=0;i<num;i++)
+			AttackList.pop();
+			if(ae.actor == lyubu)
 			{
-				float start[3], pos[3], attdir[3], tmp[3], dis[3];
-				ae.actor->GetPosition(start);
-				//lyubu->GetPosition(start);
-
-				NPC *npc;
-				npc = NPCs[i];
-				if(!npc->Isdead())
+				int i, num = NPCs.size();
+				for(i=0;i<num;i++)
 				{
-					npc->GetPosition(pos);
-					//Donzo.GetPosition(pos);
-					ae.actor->GetDirection(attdir, tmp);
-					FVector::Minus(pos, start, dis);
-					FVector::Project(dis, attdir, tmp);
-					float angle = FVector::Angle(attdir, dis);
-					if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
+					float start[3], pos[3], attdir[3], tmp[3], dis[3];
+					ae.actor->GetPosition(start);
+					//lyubu->GetPosition(start);
+
+					NPC *npc;
+					npc = NPCs[i];
+					if(!npc->Isdead())
 					{
-						npc->changeState(hitted,ae.damage);
+						npc->GetPosition(pos);
+						//Donzo.GetPosition(pos);
+						ae.actor->GetDirection(attdir, tmp);
+						FVector::Minus(pos, start, dis);
+						FVector::Project(dis, attdir, tmp);
+						float angle = FVector::Angle(attdir, dis);
+						if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
+						{
+							npc->changeState(hitted,ae.damage);
+						}
+					}
+					else
+					{
+						NPCs.erase(NPCs.begin() + i);
+						i--;
 					}
 				}
 			}
+			else
+				lyubu->hit(ae.damage);
 		}
 		else
-			lyubu->hit(ae.damage);
+			ae.delay-=skip;
 	}
 	FnCamera camera;
 	camera.Object(minimap_cID);
