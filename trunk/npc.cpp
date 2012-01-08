@@ -225,12 +225,7 @@ void NPC::fsm(int skip) {
 	if(cd < MAX_CD)
 		cd += skip;
 
-	// 計算方向
-	float dir[3];
-	FVector::Minus(lyubu_pos, pos, dir);
-	float udir[3], fdir[3];
-	this->GetDirection(fdir, udir);
-	this->SetDirection(dir, udir);
+	
 
 	switch(this->state){
 
@@ -270,7 +265,16 @@ void NPC::fsm(int skip) {
 				MoveForward(5, TRUE, TRUE, 0, TRUE);
 			  }*/
 
-			
+			// 計算方向
+			float dir[3];
+			if(!this->Isdead())
+			{
+				FVector::Minus(lyubu_pos, pos, dir);
+				float udir[3], fdir[3];
+				this->GetDirection(fdir, udir);
+				this->SetDirection(dir, udir);
+			}
+
 			if(dis < attack_dis && !lyubu->Isdead())
 			{
 				if(cd >= MAX_CD)
@@ -297,6 +301,16 @@ void NPC::fsm(int skip) {
 		}
 		case attackPlayer:
 		{
+			// 計算方向
+			float dir[3];
+			if(!this->Isdead())
+			{
+				FVector::Minus(lyubu_pos, pos, dir);
+				float udir[3], fdir[3];
+				this->GetDirection(fdir, udir);
+				this->SetDirection(dir, udir);
+			}
+
 				if(actor == 0){
 					if(attackLevel == 1)      setNPCurAction(attack,"AttackL1");
 					else if(attackLevel == 2) setNPCurAction(attack,"AttackL2");
