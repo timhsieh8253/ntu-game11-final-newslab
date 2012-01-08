@@ -48,6 +48,12 @@ private:
 	State    runState, nextRunState;
 	float face_NPC;
 	int cd;
+	void (NPC::*action)();
+	void waitAction();
+	void followAction();
+	void attackAction();
+	void hittedAction();
+	void dieAction();
 
 
 	// blood bar

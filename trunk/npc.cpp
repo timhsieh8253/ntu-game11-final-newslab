@@ -45,7 +45,8 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 	this->runState.set(NPC_IDLE);
 	this->nextRunState.set(NPC_IDLE);
 	this->cameraID = cameraid;
-
+	
+	this->changeState(wait, 0);
 	// create blood bar
 	OBJECTid sID = this->GetScene();
 	FnScene scene;
@@ -105,19 +106,21 @@ void NPC::setNPCActionID(){
 
 void NPC::changeState(int newState, int Level){
 	switch(newState){
-		case wait:           this->state = wait;			break;
-		case follow:		 this->state = follow;			break;
+		case wait:           this->state = wait;			this->action=&NPC::waitAction;		break;
+		case follow:		 this->state = follow;			this->action=&NPC::followAction;	break;
 		case attackPlayer:   
 							 this->state = attackPlayer;	
 							 this->attackLevel = Level; 
+							 this->action=&NPC::attackAction;
 							 break;
 
-		case escape:		 this->state = escape;			break;
-		case die:			 this->state = die;				break;
+		//case escape:		 this->state = escape;			break;
+		case die:			 this->state = die;				this->action=&NPC::dieAction;		break;
 		case hitted:
 							 this->state = hitted;
 							 this->hitLevel = Level; 
 							 hitNum++;
+							 this->action=&NPC::hittedAction;
 							 break;
 		default:    		 ;
 	}
@@ -207,6 +210,158 @@ void NPC::playAction(int skip){
 
 }
 
+void NPC::waitAction()
+{
+	float lyubu_pos[3], pos[3];
+	this->GetPosition(pos);
+	lyubu->GetPosition(lyubu_pos);
+
+	float follow_dis = 1000;
+	float attack_dis = 100;
+	float dis = FVector::ComputeDistance(lyubu_pos, pos);
+
+	//檢查和呂布的距離，小於限制就變 follow
+	if(dis < attack_dis && !lyubu->Isdead())
+	{
+		if(cd >= MAX_CD)
+		{
+			cd = 0;
+			this->changeState(attackPlayer, 1);
+			AttackEvent ae;
+			ae.actor = this;
+			ae.length = 150;
+			ae.width = 50;
+			ae.damage = 2;
+			ae.delay = 15;
+			AttackList.push(ae);
+		}
+	}
+	else if(dis < follow_dis && !lyubu->Isdead())
+		this->changeState(follow, 0);
+	setNPCurAction(idle,"");
+}
+
+void NPC::followAction()
+{
+
+	float lyubu_pos[3], pos[3];
+	this->GetPosition(pos);
+	lyubu->GetPosition(lyubu_pos);
+
+	float follow_dis = 1000;
+	float attack_dis = 100;
+	float dis = FVector::ComputeDistance(lyubu_pos, pos);
+
+	// 計算方向
+	float dir[3];
+	if(!this->Isdead())
+	{
+		FVector::Minus(lyubu_pos, pos, dir);
+		float udir[3], fdir[3];
+		this->GetDirection(fdir, udir);
+		this->SetDirection(dir, udir);
+	}
+
+	if(dis < attack_dis && !lyubu->Isdead())
+	{
+		if(cd >= MAX_CD)
+		{
+			cd = 0;
+			this->changeState(attackPlayer, 1);
+			AttackEvent ae;
+			ae.actor = this;
+			ae.length = 150;
+			ae.width = 50;
+			ae.damage = 2;
+			ae.delay = 15;
+			AttackList.push(ae);
+		}
+	}
+	else if(dis >= follow_dis || lyubu->Isdead())
+		this->changeState(wait, 0);
+
+	setNPCurAction(run,"");
+	
+	this->MoveForward(5, TRUE, TRUE, 0, TRUE);
+}
+
+void NPC::attackAction()
+{
+	float lyubu_pos[3], pos[3];
+	this->GetPosition(pos);
+	lyubu->GetPosition(lyubu_pos);
+
+	float follow_dis = 1000;
+	float attack_dis = 100;
+	float dis = FVector::ComputeDistance(lyubu_pos, pos);
+	// 計算方向
+	float dir[3];
+	if(!this->Isdead())
+	{
+		FVector::Minus(lyubu_pos, pos, dir);
+		float udir[3], fdir[3];
+		this->GetDirection(fdir, udir);
+		this->SetDirection(dir, udir);
+	}
+
+	if(actor == 0){
+		if(attackLevel == 1)      setNPCurAction(attack,"AttackL1");
+		else if(attackLevel == 2) setNPCurAction(attack,"AttackL2");
+		else if(attackLevel == 3) setNPCurAction(attack,"AttackH");
+		else					  setNPCurAction(attack,"HeavyAttack");
+	}
+	else{
+		if(attackLevel == 1)      setNPCurAction(attack,"NormalAttack1");
+		else if(attackLevel == 2) setNPCurAction(attack,"NormalAttack2");
+		else if(attackLevel == 3) setNPCurAction(attack,"HeavyAttack1");
+	}
+}
+
+void NPC::hittedAction()
+{
+	FnBillBoard bb;
+	if(actor == 0){
+		if(curActID != damageID && curActID != defanceID) decreaseLife(hitLevel);
+	}
+	else{
+		if(curActID != damageID) decreaseLife(hitLevel);
+	}
+	
+	bb.Object(this->bloodID, this->blood_billboardID);
+	float size[2];
+	size[0] = 3.0f*life;
+	size[1] = 5.0f;
+	bb.SetSize(size);
+
+	if(life <= 0)
+	{
+		this->changeState(die, 0);
+	}
+	else
+	{
+		if(actor == 0){
+			if(hitLevel == 1){      setNPCurAction(damage,"DamageL");
+									fx->Damage1("donzo_damage", *this);
+			}
+			else if(hitLevel == 2){ setNPCurAction(damage,"DamageH");
+									fx->Damage2("donzo_damage", *this);
+			}
+			else{					setNPCurAction(defance,"");
+									fx->Defense1("donzo_defense", *this);
+			}
+		}
+		else{
+			if(hitLevel == 1)      setNPCurAction(damage,"Damage1");
+			else if(hitLevel == 2) setNPCurAction(damage,"Damage2");
+			else				   setNPCurAction(damage,"Damage2");
+		}
+	}
+}
+
+void NPC::dieAction()
+{
+	setNPCurAction(dead,"");
+}
 
 /********************************************************************/
 // NPC 的 FSM
@@ -218,169 +373,10 @@ void NPC::playAction(int skip){
 void NPC::fsm(int skip) {
 
 	playAction(skip);
-	FnBillBoard bb;
-
-	float lyubu_pos[3], pos[3];
-	this->GetPosition(pos);
-	lyubu->GetPosition(lyubu_pos);
-
-	float follow_dis = 1000;
-	float attack_dis = 100;
-	float dis = FVector::ComputeDistance(lyubu_pos, pos);
-
 	if(cd < MAX_CD)
 		cd += skip;
 
-	
-
-	switch(this->state){
-
-		case wait:
-		{
-			//檢查和呂布的距離，小於限制就變 follow
-			if(dis < attack_dis && !lyubu->Isdead())
-			{
-				if(cd >= MAX_CD)
-				{
-					cd = 0;
-					this->changeState(attackPlayer, 1);
-					AttackEvent ae;
-					ae.actor = this;
-					ae.length = 150;
-					ae.width = 50;
-					ae.damage = 2;
-					ae.delay = 15;
-					AttackList.push(ae);
-				}
-			}
-			else if(dis < follow_dis && !lyubu->Isdead())
-				this->changeState(follow, 0);
-			setNPCurAction(idle,"");
-
-			break;
-		}
-
-		case follow:
-		{
-			  /*if(runState.contain(NPC_UP) || runState.contain(NPC_DOWN) 
-				 || runState.contain(NPC_move_left) || runState.contain(NPC_move_right) )
-			  {
-				test = 2;
-				setNPCurAction(run,"");
-				turn();
-				MoveForward(5, TRUE, TRUE, 0, TRUE);
-			  }*/
-
-			// 計算方向
-			float dir[3];
-			if(!this->Isdead())
-			{
-				FVector::Minus(lyubu_pos, pos, dir);
-				float udir[3], fdir[3];
-				this->GetDirection(fdir, udir);
-				this->SetDirection(dir, udir);
-			}
-
-			if(dis < attack_dis && !lyubu->Isdead())
-			{
-				if(cd >= MAX_CD)
-				{
-					cd = 0;
-					this->changeState(attackPlayer, 1);
-					AttackEvent ae;
-					ae.actor = this;
-					ae.length = 150;
-					ae.width = 50;
-					ae.damage = 2;
-					ae.delay = 15;
-					AttackList.push(ae);
-				}
-			}
-			else if(dis >= follow_dis || lyubu->Isdead())
-				this->changeState(wait, 0);
-
-			setNPCurAction(run,"");
-			
-			this->MoveForward(5, TRUE, TRUE, 0, TRUE);
-
-			break;
-		}
-		case attackPlayer:
-		{
-			// 計算方向
-			float dir[3];
-			if(!this->Isdead())
-			{
-				FVector::Minus(lyubu_pos, pos, dir);
-				float udir[3], fdir[3];
-				this->GetDirection(fdir, udir);
-				this->SetDirection(dir, udir);
-			}
-
-				if(actor == 0){
-					if(attackLevel == 1)      setNPCurAction(attack,"AttackL1");
-					else if(attackLevel == 2) setNPCurAction(attack,"AttackL2");
-					else if(attackLevel == 3) setNPCurAction(attack,"AttackH");
-					else					  setNPCurAction(attack,"HeavyAttack");
-				}
-				else{
-					if(attackLevel == 1)      setNPCurAction(attack,"NormalAttack1");
-					else if(attackLevel == 2) setNPCurAction(attack,"NormalAttack2");
-					else if(attackLevel == 3) setNPCurAction(attack,"HeavyAttack1");
-				}			
-
-			break;
-		}
-		case escape: break;
-
-		case hitted:
-		{
-			if(actor == 0){
-				if(curActID != damageID && curActID != defanceID) decreaseLife(hitLevel);
-			}
-			else{
-				if(curActID != damageID) decreaseLife(hitLevel);
-			}
-			
-			bb.Object(this->bloodID, this->blood_billboardID);
-			float size[2];
-			size[0] = 3.0f*life;
-			size[1] = 5.0f;
-			bb.SetSize(size);
-
-			if(life <= 0)
-			{
-				this->state = die;
-			}
-			else
-			{
-				if(actor == 0){
-					if(hitLevel == 1){      setNPCurAction(damage,"DamageL");
-											fx->Damage1("donzo_damage", *this);
-					}
-					else if(hitLevel == 2){ setNPCurAction(damage,"DamageH");
-											fx->Damage2("donzo_damage", *this);
-					}
-					else{					setNPCurAction(defance,"");
-											fx->Defense1("donzo_defense", *this);
-					}
-				}
-				else{
-					if(hitLevel == 1)      setNPCurAction(damage,"Damage1");
-					else if(hitLevel == 2) setNPCurAction(damage,"Damage2");
-					else				   setNPCurAction(damage,"Damage2");
-				}
-			}
-
-			break;
-		}
-		case die:
-		{
-			setNPCurAction(dead,"");
-			break;
-		}
-		default:;
-	}
+	(this->*(this->action))();
 
 }
 
