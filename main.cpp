@@ -246,15 +246,21 @@ void GameAI(int skip)
 	Donzo.fsm(skip);
 	AttackList.reduceDelay(skip);
 
+	// 有 Attack Event
 	if(AttackList.size()>0)
 	{
 		AttackEvent ae = AttackList.front();
+		// delay 小於零，代表可以處理了
 		if(ae.delay < 0)
 		{
+			// pop 掉最上面的 event
 			AttackList.pop();
+
+			// 呂布砍人
 			if(ae.actor == lyubu)
 			{
 				int i, num = NPCs.size();
+				// 檢查每個 NPC 有沒有被砍
 				for(i=0;i<num;i++)
 				{
 					float start[3], pos[3], attdir[3], tmp[3], dis[3];
@@ -263,6 +269,7 @@ void GameAI(int skip)
 
 					NPC *npc;
 					npc = NPCs[i];
+					// 沒死的才判斷
 					if(!npc->Isdead())
 					{
 						npc->GetPosition(pos);
@@ -276,6 +283,7 @@ void GameAI(int skip)
 							npc->changeState(hitted,ae.damage);
 						}
 					}
+					// 死了之後就不要再判斷了
 					else
 					{
 						NPCs.erase(NPCs.begin() + i);
@@ -283,11 +291,10 @@ void GameAI(int skip)
 					}
 				}
 			}
+			// 呂布被砍
 			else
 				lyubu->hit(ae.damage);
 		}
-		else
-			ae.delay-=skip;
 	}
 	FnCamera camera;
 	camera.Object(minimap_cID);
