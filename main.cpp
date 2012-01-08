@@ -167,6 +167,7 @@ int main(int argc, char **argv)
 	Donzo.Play(0, START, 0.0f, FALSE, TRUE);
 
 	//FX
+	/*
 	fx00 = new eF3DFX(sID);
 	fx00->SetWorkPath("NTU4\\FXs");
 	fx00->Load("NoPigeon1");
@@ -180,6 +181,7 @@ int main(int argc, char **argv)
 		//fx->SetParent(lyubu->GetBaseObject());
 		fx->InitPosition(pos);
 	}
+	*/
 
 	// Room
 	OBJECTid roomID = scene.CreateRoom(COLLISION_ROOM, 100);
@@ -248,29 +250,34 @@ void GameAI(int skip)
 	{
 		AttackEvent ae = AttackList.front();
 		AttackList.pop();
-		int i, num = NPCs.size();
-		for(i=0;i<num;i++)
+		if(ae.actor == lyubu)
 		{
-			float start[3], pos[3], attdir[3], tmp[3], dis[3];
-			ae.actor->GetPosition(start);
-			//lyubu->GetPosition(start);
-
-			NPC *npc;
-			npc = NPCs[i];
-			if(!npc->Isdead())
+			int i, num = NPCs.size();
+			for(i=0;i<num;i++)
 			{
-				npc->GetPosition(pos);
-				//Donzo.GetPosition(pos);
-				ae.actor->GetDirection(attdir, tmp);
-				FVector::Minus(pos, start, dis);
-				FVector::Project(dis, attdir, tmp);
-				float angle = FVector::Angle(attdir, dis);
-				if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
+				float start[3], pos[3], attdir[3], tmp[3], dis[3];
+				ae.actor->GetPosition(start);
+				//lyubu->GetPosition(start);
+
+				NPC *npc;
+				npc = NPCs[i];
+				if(!npc->Isdead())
 				{
-					npc->changeState(hitted,ae.damage);
+					npc->GetPosition(pos);
+					//Donzo.GetPosition(pos);
+					ae.actor->GetDirection(attdir, tmp);
+					FVector::Minus(pos, start, dis);
+					FVector::Project(dis, attdir, tmp);
+					float angle = FVector::Angle(attdir, dis);
+					if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
+					{
+						npc->changeState(hitted,ae.damage);
+					}
 				}
 			}
 		}
+		else
+			lyubu->hit(ae.damage);
 	}
 	FnCamera camera;
 	camera.Object(minimap_cID);
@@ -278,8 +285,8 @@ void GameAI(int skip)
 	lyubu->GetPosition(pos);
 	pos[2] = 5000;
 	camera.SetPosition(pos);
-	if(!fx00->Play((float) skip))
-		fx00->Reset();
+	/*if(!fx00->Play((float) skip))
+		fx00->Reset();*/
 	return ;
 }
 
@@ -317,14 +324,14 @@ void RenderFunc(int skip)
 	// Show Message
 
 	char msg[200];
-	FnActor lyubu;
+	/*FnActor lyubu;
 	FnCamera camera;
 	lyubu.Object(lyubuID);
 	camera.Object(cID);
 	float lpos[3], cpos[3], lfdir[3], ludir[3];
 	lyubu.GetPosition(lpos);
 	lyubu.GetDirection(lfdir, ludir);
-	camera.GetPosition(cpos);
+	camera.GetPosition(cpos);*/
 	
 	gw.StartMessageDisplay();
 /*	sprintf(msg, "Lyubu: %.03f %.03f %.03f\nCamera: %.03f %.03f %.03f", lpos[0], lpos[1], lpos[2], cpos[0], cpos[1], cpos[2]);
@@ -342,6 +349,8 @@ void RenderFunc(int skip)
 
 	sprintf(msg, "npc: %d  State:%d  Life = %d", Donzo.getTest(), Donzo.getState(), Donzo.getlife());
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
+	sprintf(msg, "State:%d Blood = %.0f\n", lyubu->getState(), lyubu->getBlood());
+	gw.MessageOnScreen(10, 30, msg, 255, 255, 255);
 
 	float output[2], input[3];
 	Donzo.GetPosition(input);

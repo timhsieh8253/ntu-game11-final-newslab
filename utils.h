@@ -69,7 +69,7 @@ class State
 
 		void remove(int s)
 		{
-			state = state ^ s;
+			state = state & (~s);
 		}
 		
 		bool contain(int s)
