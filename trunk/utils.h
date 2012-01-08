@@ -1,6 +1,7 @@
 #ifndef UTILS
 #define UTILS
 #include "TheFlyWin32.h"
+#include <vector>
 
 class FVector
 {
@@ -47,6 +48,8 @@ public:
 	static float ComputeDistance(float *v1, float *v2);
 };
 
+
+
 class State
 {
 	private:
@@ -87,6 +90,55 @@ public:
 	float length;
 	float width;
 	int damage;
+	int delay;
+};
+
+class MyAttackQueue
+{
+private:
+	std::vector<AttackEvent> queue;
+
+public:
+
+	void push(AttackEvent ae)
+	{
+		int num = queue.size();
+		queue.resize(num + 1);
+		int i = num;
+		while(i > 0 && queue[i-1].delay > ae.delay)
+		{
+			queue[i] = queue[i-1];
+			i--;
+		}
+		queue[i] = ae;
+	}
+
+	void reduceDelay(int skip)
+	{
+		int num = queue.size();
+		int i;
+		for(i=0;i<num;i++)
+		{
+			AttackEvent ae = queue[i];
+			ae.delay -= skip;
+			queue[i] = ae;
+		}
+	}
+
+	void pop()
+	{
+		queue.erase(queue.begin());
+	}
+
+	AttackEvent front()
+	{
+		return queue[0];
+	}
+
+	int size()
+	{
+		return queue.size();
+	}
 };
 
 #endif

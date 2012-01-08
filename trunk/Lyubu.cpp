@@ -5,7 +5,7 @@
 
 using namespace std;
 
-extern queue<AttackEvent> AttackList;
+extern MyAttackQueue AttackList;
 
 Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : FnActor()
 {
@@ -225,18 +225,21 @@ void Lyubu::MakeAction()
 				ae.length = 150;
 				ae.width = 30;
 				ae.damage = 1;
+				ae.delay = 7;
 			}
 			else if(curAttID == nAtt4ID)
 			{
 				ae.length = 150;
 				ae.width = 30;
 				ae.damage = 4;
+				ae.delay = 15;
 			}
 			else
 			{
 				ae.length = 150;
 				ae.width = 150;
 				ae.damage = 2;
+				ae.delay = 20;
 			}
 			
 
