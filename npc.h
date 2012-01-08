@@ -1,13 +1,13 @@
 #include "utils.h"
 
-enum Action   {idle, run, right, left, attack, damage, defance, dead};
+enum Action   {idle, run, move_right, move_left, attack, damage, defance, dead};
 enum NPCState {wait, follow, attackPlayer, escape, hitted, die};
 
 #define NPC_IDLE		0
 #define NPC_UP			1
-#define NPC_LEFT		2
+#define NPC_move_left		2
 #define NPC_DOWN		4
-#define NPC_RIGHT		8
+#define NPC_move_right		8
 #define NPC_ATT			16
 
 class NPC : public FnActor{
@@ -43,7 +43,7 @@ private:
 
 	OBJECTid npc_id, cameraID;
 	ACTIONid curActID, nextActID;
-	ACTIONid idleID,   runID,    rightID,   leftID;
+	ACTIONid idleID,   runID,    move_rightID,   move_leftID;
 	ACTIONid attackID, damageID, defanceID, deadID;
 	State    runState, nextRunState;
 	float face_NPC;

@@ -2,6 +2,7 @@
 #include "npc.h"
 #include "Lyubu.h"
 #include "utils.h"
+#include "FX.h"
 
 #include <queue>
 
@@ -11,6 +12,7 @@ using namespace std;
 
 extern Lyubu *lyubu; // 把呂布拿來用
 extern MyAttackQueue AttackList;
+extern FX *fx;
 
 /********************************************************************/
 // 初始化 (actor = 0 董卓 , actor = 1 小兵)
@@ -82,8 +84,8 @@ void NPC::setNPCActionID(){
 	{
 		idleID     = GetBodyAction(NULL, "CombatIdle");
 		runID      = GetBodyAction(NULL, "Run");
-		rightID    = GetBodyAction(NULL, "MoveRight");
-		leftID     = GetBodyAction(NULL, "MoveLeft");
+		move_rightID    = GetBodyAction(NULL, "Movemove_right");
+		move_leftID     = GetBodyAction(NULL, "Movemove_left");
 		attackID   = GetBodyAction(NULL, "NormalAttack1");
 		damageID   = GetBodyAction(NULL, "Damage1");
 		deadID     = GetBodyAction(NULL, "Dead");
@@ -125,7 +127,7 @@ void NPC::changeState(int newState, int Level){
 // 改變 NPC 動作，在 fsm 中相對應state視需求呼叫
 //
 // 傳入參數:
-// action:      {dle, run, right, left, attack, damage, defance, dead}
+// action:      {dle, run, move_right, move_left, attack, damage, defance, dead}
 // ActionName:  在同一action有不同程度的動作時，傳入動作字串 (例如:attack, damage)
 //
 /********************************************************************/
@@ -138,11 +140,11 @@ void NPC::setNPCurAction(int action, char *ActionName){
 		case run:
 			nextActID = runID;
 			break;
-		case right:
-			nextActID = rightID;
+		case move_right:
+			nextActID = move_rightID;
 			break;
-		case left:
-			nextActID = leftID;
+		case move_left:
+			nextActID = move_leftID;
 			break;
 		case attack:
 			attackID = GetBodyAction(NULL, ActionName);
@@ -186,6 +188,10 @@ void NPC::playAction(int skip){
 			Play(0, LOOP, (float)skip, FALSE, TRUE);
 
 		if(!flag){
+			if(this->state == hitted)
+				fx->Delete("donzo_damage");
+			else if(this->state == attackPlayer)
+				fx->Delete("donzo_attack");
 			changeState(wait,0);
 			flag = TRUE;
 		}
@@ -257,7 +263,7 @@ void NPC::fsm(int skip) {
 		case follow:
 		{
 			  /*if(runState.contain(NPC_UP) || runState.contain(NPC_DOWN) 
-				 || runState.contain(NPC_LEFT) || runState.contain(NPC_RIGHT) )
+				 || runState.contain(NPC_move_left) || runState.contain(NPC_move_right) )
 			  {
 				test = 2;
 				setNPCurAction(run,"");
@@ -349,9 +355,15 @@ void NPC::fsm(int skip) {
 			else
 			{
 				if(actor == 0){
-					if(hitLevel == 1)      setNPCurAction(damage,"DamageL");
-					else if(hitLevel == 2) setNPCurAction(damage,"DamageH");
-					else				   setNPCurAction(defance,"");
+					if(hitLevel == 1){      setNPCurAction(damage,"DamageL");
+											fx->Damage1("donzo_damage", *this);
+					}
+					else if(hitLevel == 2){ setNPCurAction(damage,"DamageH");
+											fx->Damage2("donzo_damage", *this);
+					}
+					else{					setNPCurAction(defance,"");
+											fx->Defense1("donzo_defense", *this);
+					}
 				}
 				else{
 					if(hitLevel == 1)      setNPCurAction(damage,"Damage1");
@@ -390,9 +402,9 @@ void NPC::changeRunState(BYTE code, BOOL value)
 				break;
 			case FY_F:
 				if(value)
-					runState.add(NPC_LEFT);
+					runState.add(NPC_move_left);
 				else
-					runState.remove(NPC_LEFT);
+					runState.remove(NPC_move_left);
 				break;
 			case FY_G:
 				if(value)
@@ -402,9 +414,9 @@ void NPC::changeRunState(BYTE code, BOOL value)
 				break;
 			case FY_H:
 				if(value)
-					runState.add(NPC_RIGHT);
+					runState.add(NPC_move_right);
 				else
-					runState.remove(NPC_RIGHT);
+					runState.remove(NPC_move_right);
 				break;
 		}
 
@@ -450,28 +462,28 @@ void NPC::MakeAction()
 		case NPC_UP:
 			face_NPC = 0;
 			break;
-		case NPC_LEFT:
+		case NPC_move_left:
 			face_NPC = 270;
 			break;
 		case NPC_DOWN:
 			face_NPC = 180;
 			break;
-		case NPC_RIGHT:
+		case NPC_move_right:
 			face_NPC = 90;
 			break;
-		case (NPC_UP | NPC_LEFT):
+		case (NPC_UP | NPC_move_left):
 			face_NPC = 315;
 			break;
-		case (NPC_UP | NPC_RIGHT):
+		case (NPC_UP | NPC_move_right):
 			face_NPC = 45;
 			break;
-		case (NPC_DOWN | NPC_RIGHT):
+		case (NPC_DOWN | NPC_move_right):
 			face_NPC = 135;
 			break;
-		case (NPC_DOWN | NPC_LEFT):
+		case (NPC_DOWN | NPC_move_left):
 			face_NPC = 225;
 			break;
-		case (NPC_LEFT | NPC_RIGHT):
+		case (NPC_move_left | NPC_move_right):
 			face_NPC = 270;
 			break;
 	}
