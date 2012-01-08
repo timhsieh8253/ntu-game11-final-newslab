@@ -287,6 +287,7 @@ void GameAI(int skip)
 					else
 					{
 						NPCs.erase(NPCs.begin() + i);
+						num--;
 						i--;
 					}
 				}
