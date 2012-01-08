@@ -171,10 +171,6 @@ int main(int argc, char **argv)
 	if(!Donzo.PutOnTerrain(tID, FALSE, 0.0f))
 	   exit(1);
 
-	// Default Action is Idle
-	Donzo.setNPCurAction(idle, "CombatIdle");
-	Donzo.Play(0, START, 0.0f, FALSE, TRUE);
-
 	// Load Robber
 	OBJECTid RobberID = scene.LoadActor("Robber02");
 	NPC *robber = new NPC();
@@ -188,8 +184,6 @@ int main(int argc, char **argv)
 
 	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
 	   exit(3);
-
-	robber->changeState(wait, 0);
 
 	//FX
 	fx = new FX(sID);
@@ -248,11 +242,10 @@ int main(int argc, char **argv)
 	// Play Background music
 	FyBeginMedia("NTU4\\Media", 1);
 	hwnd = FyGetWindowHandle(gw.Object());
-	mmID = FyCreateMediaPlayer(0, "menu", 0, 0, 0, 0);
+	mmID = FyCreateMediaPlayer(hwnd, "menu", 0, 0, 0, 0);
 	mP.Object(mmID);
-	mP.Play(LOOP);
-	End = FyGetWindowHandle(gw.Object());
-	endID = FyCreateMediaPlayer(0, "end", 0, 0, 0, 0);
+	
+	endID = FyCreateMediaPlayer(hwnd, "end", 0, 0, 0, 0);
 
 	gw.SetAudioPath("NTU4\\Audio");
     audioID = gw.CreateAudio();
@@ -268,8 +261,9 @@ int main(int argc, char **argv)
     audio4.Object(audioID);
     A4 = audio4.Load("01_pose07");
 
+	mP.Play(LOOP);
 	FyInvokeTheFly(TRUE);
-
+	
 
 	return 0;
 }
@@ -325,13 +319,6 @@ void GameAI(int skip)
 								}
 							}
 						}
-					}
-					// 死了之後就不要再判斷了
-					else
-					{
-						NPCs.erase(NPCs.begin() + i);
-						num--;
-						i--;
 					}
 				}
 			}
