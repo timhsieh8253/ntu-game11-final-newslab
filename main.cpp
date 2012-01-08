@@ -175,6 +175,22 @@ int main(int argc, char **argv)
 	Donzo.setNPCurAction(idle, "CombatIdle");
 	Donzo.Play(0, START, 0.0f, FALSE, TRUE);
 
+	// Load Robber
+	OBJECTid RobberID = scene.LoadActor("Robber02");
+	NPC *robber = new NPC();
+	NPCs.push_back(robber);
+	robber->init(RobberID, 1, cID);
+
+	pos[0] = 3454.f;
+	pos[1] = -3874.f;
+	pos[2] = 100.0f;
+	robber->SetPosition(pos);
+
+	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
+	   exit(3);
+
+	robber->changeState(wait, 0);
+
 	//FX
 	fx = new FX(sID);
 
@@ -184,9 +200,6 @@ int main(int argc, char **argv)
 	room.Object(roomID);
 	room.AddEntity(lyubuID);
 	room.AddEntity(DonzoID);
-
-
-
 
 
 	// Light
@@ -264,7 +277,9 @@ int main(int argc, char **argv)
 void GameAI(int skip)
 {
 	(lyubu->*(lyubu->nextFrame))(skip); // 很複雜的 Function 指標 囧 不過可以省下 if else
-	Donzo.fsm(skip);
+	int i, num = NPCs.size();
+	for(i=0;i<num;i++)
+		NPCs[i]->fsm(skip);
 	AttackList.reduceDelay(skip);
 
 	// 有 Attack Event
@@ -280,7 +295,7 @@ void GameAI(int skip)
 			// 呂布砍人
 			if(ae.actor == lyubu)
 			{
-				int i, num = NPCs.size();
+				
 				// 檢查每個 NPC 有沒有被砍
 				for(i=0;i<num;i++)
 				{
@@ -394,6 +409,10 @@ void RenderFunc(int skip)
 	lyubu.GetDirection(lfdir, ludir);
 	camera.GetPosition(cpos);*/
 
+	float lpos[3];
+	lyubu->GetPosition(lpos);
+
+
 	gw.StartMessageDisplay();
 /*	sprintf(msg, "Lyubu: %.03f %.03f %.03f\nCamera: %.03f %.03f %.03f", lpos[0], lpos[1], lpos[2], cpos[0], cpos[1], cpos[2]);
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
@@ -410,7 +429,7 @@ void RenderFunc(int skip)
 
 	sprintf(msg, "npc: %d  State:%d  Life = %d", Donzo.getTest(), Donzo.getState(), Donzo.getlife());
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
-	sprintf(msg, "State:%d Blood = %.0f\n", lyubu->getState(), lyubu->getBlood());
+	sprintf(msg, "State:%d Blood = %.0f Pos: %f %f\n", lyubu->getState(), lyubu->getBlood(), lpos[0], lpos[1]);
 	gw.MessageOnScreen(10, 30, msg, 255, 255, 255);
 
 	float output[2], input[3];
