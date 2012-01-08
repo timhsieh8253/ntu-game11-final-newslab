@@ -1,5 +1,6 @@
 #include "Lyubu.h"
 #include "utils.h"
+
 #include "FX.h"
 
 #include <queue>
@@ -23,7 +24,7 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 
 void Lyubu::init()
 {
-	
+
 	float pos[3] = {3569.0f, -3208.0f, 0.f};
 	this->SetPosition(pos);
 
@@ -61,14 +62,14 @@ void Lyubu::init()
 	pos[0] = 0.0f;
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
-	
+
 	size[0] = this->blood*3;
 	size[1] = 5.0f;
 	//pos[0]-=fullblood-size[0];
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
-	
+
 	blood_billboardID = blood.Billboard(pos, size, NULL, 0, color);
-	
+
 }
 
 bool Lyubu::Isdead(){
@@ -179,7 +180,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 			MakeAction();
 	}
 
-	
+
 }
 
 void Lyubu::MakeAction()
@@ -222,7 +223,7 @@ void Lyubu::MakeAction()
 			this->MakeCurrentAction(0, NULL, this->curAttID);
 			this->curActID = this->curAttID;
 			this->Play(0, START, 0.0f, FALSE, TRUE);
-		
+
 			AttackEvent ae;
 			ae.actor = this;
 			if(curAttID == nAtt1ID)
@@ -246,7 +247,7 @@ void Lyubu::MakeAction()
 				ae.damage = 2;
 				ae.delay = 20;
 			}
-			
+
 
 			AttackList.push(ae);
 
@@ -337,8 +338,8 @@ void Lyubu::UpFunction(int skip)
 
 	float pos_lyubu[3], pos_camera[3], walk[3], walkdist;
 	float newpos_lyubu[3];
-	float height, dist, angle; 
-	
+	float height, dist, angle;
+
 	this->GetPosition(pos_lyubu);
 	camera.GetPosition(pos_camera);
 	height = fabs(pos_camera[2] - pos_lyubu[2]);
@@ -357,12 +358,12 @@ void Lyubu::UpFunction(int skip)
 	terrain.Object(this->terrainID);
 	if(height > minHeight)
 	{
-		
+
 		Distance = dist + walkdist;
 		float new_height = sqrt(pow(maxDistance,2) + pow(minHeight, 2) - pow(Distance, 2));
 		float new_angle = acos(new_height / sqrt(pow(maxDistance,2) + pow(minHeight, 2)));
 		float axis[3];
-		
+
 		pos_camera[2] = new_height + newpos_lyubu[2];
 		FVector::CrossProduct(ludir, cfdir, axis);
 		FVector::Minus(newpos_lyubu, pos_camera, cfdir);
@@ -392,7 +393,7 @@ void Lyubu::DownFunction(int skip)
 
 	float pos_lyubu[3], pos_camera[3], walk[3], walkdist;
 	float newpos_lyubu[3];
-	float height, dist, angle; 
+	float height, dist, angle;
 
 	this->GetPosition(pos_lyubu);
 	camera.GetPosition(pos_camera);
@@ -406,7 +407,7 @@ void Lyubu::DownFunction(int skip)
 	FVector::Minus(newpos_lyubu, pos_lyubu, walk);
 
 	/* camera撞牆，將camera向上抬 */
-	
+
 	FnTerrain terrain;
 	float hitPos[3], origin[3] = {pos_camera[0], pos_camera[1], newpos_lyubu[2]};
 	float hitDis;
@@ -414,7 +415,7 @@ void Lyubu::DownFunction(int skip)
 	float hitNorm[3];
 	if(terrain.HitTest(origin,lfdir,hitPos,FALSE, NULL, hitNorm))
 	{
-		
+
 		hitDis = FVector::ComputeDistance(origin, hitPos);
 		// camera up
 		if( hitDis < walkdist){
@@ -424,7 +425,7 @@ void Lyubu::DownFunction(int skip)
 			Distance = sqrt(pow(pos_camera[0] - pos_lyubu[0],2) + pow(pos_camera[1] - pos_lyubu[1],2));
 			float new_height = sqrt(pow(maxDistance,2) + pow(minHeight, 2) - pow(Distance, 2));
 			float new_angle = acos(new_height / sqrt(pow(maxDistance,2) + pow(minHeight, 2)));
-			
+
 			pos_camera[2] = new_height + newpos_lyubu[2];
 			FVector::CrossProduct(ludir, cfdir, axis);
 			FVector::Minus(newpos_lyubu, pos_camera, cfdir);
@@ -462,7 +463,7 @@ void Lyubu::LeftRightFunction(int skip)
 
 	int mf_state;
 	int hitRotate = 0;
-	
+
 	float dis = 10.0f;
 	float rad = (float) ((dis/2/Distance) * 180.0/3.1415926 * 2);
 	float lastRad = rad;
@@ -471,7 +472,7 @@ void Lyubu::LeftRightFunction(int skip)
 
 	// camera 沒被擋住，或camera被擋住但呂布改向另一邊跑才可以改變呂布臉方向
 	FVector::Rotate(lfdir, ludir, rad/2, lfdir); // Rotate(src, axis, angle, dst)
-	if(hitRotate != 2 || lastRad != rad) 
+	if(hitRotate != 2 || lastRad != rad)
 		this->SetDirection(lfdir, ludir);
 
 	mf_state = this->MoveForward(dis, TRUE, TRUE, 0, TRUE);
@@ -481,7 +482,7 @@ void Lyubu::LeftRightFunction(int skip)
 	FVector::Rotate(cudir, ludir, rad, cudir);
 
 	FVector::Rotate(lfdir, ludir, rad/2, lfdir);
-	if(hitRotate != 2 || lastRad != rad) 
+	if(hitRotate != 2 || lastRad != rad)
 		this->SetDirection(lfdir, ludir);
 
 	if(mf_state < 0)
@@ -494,9 +495,9 @@ void Lyubu::LeftRightFunction(int skip)
 		FVector::Copy(pos2,camera_old);
 
 		FVector::Minus(pos2, pos1, pos2);
-		
+
 		// 繞著呂布頭頂轉camera
-		FVector::Rotate(pos2, ludir, rad, pos2); 
+		FVector::Rotate(pos2, ludir, rad, pos2);
 		FVector::Add(pos1, pos2, pos2);
 		FVector::Copy( pos2, camera_new);
 		FVector::Minus( camera_new, camera_old , camera_dir);
@@ -513,7 +514,7 @@ void Lyubu::LeftRightFunction(int skip)
 			hitLen = FVector::ComputeDistance(hitPos,camera_old);
 
 			origin[0] = camera_new[0];
-			origin[1] = camera_new[1]; 
+			origin[1] = camera_new[1];
 			origin[2] = pos1[2];
 			cameraLen = FVector::ComputeDistance(pos1, origin);
 

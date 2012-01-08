@@ -23,6 +23,13 @@ NPC Donzo;
 Lyubu *lyubu;
 OBJECTid DonzoID;
 
+HWND hwnd,End;
+MEDIAid mmID,endID;
+FnMedia mP,endP;
+AUDIOid audioID;
+FnAudio audio1,audio2,audio3,audio4;
+BOOL A1,A2,A3,A4;
+
 State walk_state;
 int turn_state;
 int mf_state;
@@ -42,6 +49,8 @@ void Keydown(WORLDid, BYTE, BOOL);
 void RenderFunc(int);
 void GameAI(int skip);
 
+
+
 vector<NPC *> NPCs;
 
 void attack_test(FnActor attacker, FnActor defender, int att_dis);
@@ -57,6 +66,7 @@ int main(int argc, char **argv)
 	wsprintf(pBuf,L"123\n");
     WriteConsole(hd ,pBuf,wcslen(pBuf), NULL , NULL );
     CloseHandle(hd) ;*/
+
 
 	// Create a new World
 	FnWorld gw;
@@ -89,8 +99,8 @@ int main(int argc, char **argv)
 	if(model.Load("terrain")==FALSE)
 		exit(2);
 	model.ChangeRenderGroup(0);
-	
-	
+
+
 	float minimap_cpos[3] = {3569.0f, -3208.0f, 5000.0f};
 	minimap_cID = scene2.CreateCamera(ROOT);
 	FnCamera camera;
@@ -107,7 +117,7 @@ int main(int argc, char **argv)
 	gw.SetTexturePath("NTU4\\Characters");
 	billboardID = arrow.Billboard(arrow_pos, arrow_size, "arrowU", 0, NULL);
 	FnBillBoard bb;
-	
+
 	bb.Object(arrowID, billboardID);
 	arrow.SetParent(minimap_cID);
 	arrow.ChangeRenderGroup(1);
@@ -131,7 +141,7 @@ int main(int argc, char **argv)
 
 
 	//terrain.Show(TRUE);
-	
+
 	// Reset path
 	gw.SetObjectPath("NTU4\\Characters");
 	gw.SetTexturePath("NTU4\\Characters");
@@ -142,7 +152,7 @@ int main(int argc, char **argv)
 	cID = scene.CreateCamera(ROOT);
 
 	// Lyubu
-	
+
 	OBJECTid lyubuID = scene.LoadActor("Lyubu");
 	lyubu = new Lyubu(lyubuID, cID, tID, arrowID, billboardID);
 	lyubu->Object(lyubuID);
@@ -176,7 +186,7 @@ int main(int argc, char **argv)
 	room.AddEntity(DonzoID);
 
 
-	
+
 
 
 	// Light
@@ -191,6 +201,8 @@ int main(int argc, char **argv)
 	light2.Object(lID);
 	light2.SetName("MapLight");
 	light2.Translate(-50.0f, -50.0f, 50.0f, GLOBAL);
+
+
 
 	// Set Hotkeys
 	FyDefineHotKey(FY_W, Keydown, FALSE);
@@ -220,7 +232,31 @@ int main(int argc, char **argv)
 	FyBindTimer(0, 30.0f, RenderFunc, TRUE);
 	FyBindTimer(1, 30.0f, GameAI, TRUE);
 
+	// Play Background music
+	FyBeginMedia("NTU4\\Media", 1);
+	hwnd = FyGetWindowHandle(gw.Object());
+	mmID = FyCreateMediaPlayer(0, "menu", 0, 0, 0, 0);
+	mP.Object(mmID);
+	mP.Play(LOOP);
+	End = FyGetWindowHandle(gw.Object());
+	endID = FyCreateMediaPlayer(0, "end", 0, 0, 0, 0);
+
+	gw.SetAudioPath("NTU4\\Audio");
+    audioID = gw.CreateAudio();
+    audio1.Object(audioID);
+    A1 = audio1.Load("03_pose18");
+	audioID = gw.CreateAudio();
+	audio2.Object(audioID);
+	A2 = audio2.Load("03_pose25"); // Lyubu died
+	audioID = gw.CreateAudio();
+    audio3.Object(audioID);
+    A3 = audio3.Load("02_pose25"); //Dozon die
+	audioID = gw.CreateAudio();
+    audio4.Object(audioID);
+    A4 = audio4.Load("01_pose07");
+
 	FyInvokeTheFly(TRUE);
+
 
 	return 0;
 }
@@ -266,6 +302,13 @@ void GameAI(int skip)
 						if(angle<90 && FVector::Magnitude(tmp)<=ae.length && sin(angle*3.14159/180)*FVector::Magnitude(tmp) < ae.width)
 						{
 							npc->changeState(hitted,ae.damage);
+							if(npc == &Donzo){
+								if(npc->Isdead())
+									audio3.Play(0);
+								else{
+									audio4.Play(0);
+								}
+							}
 						}
 					}
 					// 死了之後就不要再判斷了
@@ -279,7 +322,14 @@ void GameAI(int skip)
 			}
 			// 呂布被砍
 			else
+			{
 				lyubu->hit(ae.damage);
+				if(lyubu->Isdead())
+					audio2.Play(0);
+				else
+					audio1.Play(0);
+			}
+
 		}
 	}
 	FnCamera camera;
@@ -288,6 +338,15 @@ void GameAI(int skip)
 	lyubu->GetPosition(pos);
 	pos[2] = 5000;
 	camera.SetPosition(pos);
+
+	if(lyubu->getBlood()<=0){
+		mP.Stop();
+		endP.Object(endID);
+		endP.Play(ONCE);
+	}
+
+	/*if(!fx00->Play((float) skip))
+		fx00->Reset();*/
 	fx->Play((float) skip);
 	return ;
 }
@@ -322,7 +381,7 @@ void RenderFunc(int skip)
 
 	FnWorld gw;
 	gw.Object(gID);
-	
+
 	// Show Message
 
 	char msg[200];
@@ -334,7 +393,7 @@ void RenderFunc(int skip)
 	lyubu.GetPosition(lpos);
 	lyubu.GetDirection(lfdir, ludir);
 	camera.GetPosition(cpos);*/
-	
+
 	gw.StartMessageDisplay();
 /*	sprintf(msg, "Lyubu: %.03f %.03f %.03f\nCamera: %.03f %.03f %.03f", lpos[0], lpos[1], lpos[2], cpos[0], cpos[1], cpos[2]);
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
@@ -365,6 +424,6 @@ void RenderFunc(int skip)
 	gw.FinishMessageDisplay();
 
 	// Show Message End
-	
+
 	gw.SwapBuffers();
 }
