@@ -47,6 +47,7 @@ private:
 	ACTIONid attackID, damageID, defanceID, deadID;
 	State    runState, nextRunState;
 	float face_NPC;
+	int cd;
 
 
 	// blood bar

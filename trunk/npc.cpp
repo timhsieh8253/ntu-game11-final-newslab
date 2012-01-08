@@ -3,7 +3,14 @@
 #include "Lyubu.h"
 #include "utils.h"
 
+#include <queue>
+
+#define MAX_CD 60
+
+using namespace std;
+
 extern Lyubu *lyubu; // 把呂布拿來用
+extern queue<AttackEvent> AttackList;
 
 /********************************************************************/
 // 初始化 (actor = 0 董卓 , actor = 1 小兵)
@@ -31,6 +38,7 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 	attackLevel = 0;
 	hitNum = 0;
 	test = 0;
+	cd = MAX_CD;
 
 	this->runState.set(NPC_IDLE);
 	this->nextRunState.set(NPC_IDLE);
@@ -212,16 +220,38 @@ void NPC::fsm(int skip) {
 
 	float follow_dis = 1000;
 	float attack_dis = 100;
+	float dis = FVector::ComputeDistance(lyubu_pos, pos);
+
+	if(cd < MAX_CD)
+		cd += skip;
+
+	// 計算方向
+	float dir[3];
+	FVector::Minus(lyubu_pos, pos, dir);
+	float udir[3], fdir[3];
+	this->GetDirection(fdir, udir);
+	this->SetDirection(dir, udir);
 
 	switch(this->state){
 
 		case wait:
 		{
 			//檢查和呂布的距離，小於限制就變 follow
-			float dis = FVector::ComputeDistance(lyubu_pos, pos);
-			if(dis < attack_dis)
-				this->changeState(attackPlayer, 1);
-			else if(dis < follow_dis)
+			if(dis < attack_dis && !lyubu->Isdead())
+			{
+				if(cd >= MAX_CD)
+				{
+					cd = 0;
+					this->changeState(attackPlayer, 1);
+					AttackEvent ae;
+					ae.actor = this;
+					ae.length = 150;
+					ae.width = 50;
+					ae.damage = 2;
+					AttackList.push(ae);
+				}
+			}
+			else if(dis < follow_dis && !lyubu->Isdead())
 				this->changeState(follow, 0);
 			setNPCurAction(idle,"");
 
@@ -239,19 +269,26 @@ void NPC::fsm(int skip) {
 				MoveForward(5, TRUE, TRUE, 0, TRUE);
 			  }*/
 
-			float dis = FVector::ComputeDistance(lyubu_pos, pos);
-			if(dis < attack_dis)
-				this->changeState(attackPlayer, 1);
-			else if(dis >= follow_dis)
+			
+			if(dis < attack_dis && !lyubu->Isdead())
+			{
+				if(cd >= MAX_CD)
+				{
+					cd = 0;
+					this->changeState(attackPlayer, 1);
+					AttackEvent ae;
+					ae.actor = this;
+					ae.length = 150;
+					ae.width = 50;
+					ae.damage = 2;
+					AttackList.push(ae);
+				}
+			}
+			else if(dis >= follow_dis || lyubu->Isdead())
 				this->changeState(wait, 0);
 
 			setNPCurAction(run,"");
-			// 計算方向
-			float dir[3];
-			FVector::Minus(lyubu_pos, pos, dir);
-			float udir[3], fdir[3];
-			this->GetDirection(fdir, udir);
-			this->SetDirection(dir, udir);
+			
 			this->MoveForward(5, TRUE, TRUE, 0, TRUE);
 
 			break;

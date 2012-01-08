@@ -15,8 +15,7 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 	this->arrow_billboardID = bid;
 	this->minHeight = 600.0f;
 	this->maxDistance = 1000.0f;
-	this->blood = 100.0f;
-	this->fullblood = 30.0;
+	this->blood = 30.0f;
 	this->selfID = id;
 }
 
@@ -38,10 +37,11 @@ void Lyubu::init()
 	nAtt2ID = this->GetBodyAction(NULL, "NormalAttack2");
 	nAtt3ID = this->GetBodyAction(NULL, "NormalAttack3");
 	nAtt4ID = this->GetBodyAction(NULL, "NormalAttack4");
+	hittedID = this->GetBodyAction(NULL, "HeavyDamaged");
+	dieID = this->GetBodyAction(NULL, "Die");
 
 	// Default Action is Idle
 	this->state.set(LYUBU_IDLE);
-	this->next_state.set(LYUBU_IDLE);
 	this->MakeCurrentAction(0, NULL, this->idleID);
 	this->Play(0, START, 0.0f, FALSE, TRUE);
 
@@ -60,7 +60,7 @@ void Lyubu::init()
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
 	
-	size[0] = 80.0f;
+	size[0] = this->blood*3;
 	size[1] = 5.0f;
 	//pos[0]-=fullblood-size[0];
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
@@ -69,7 +69,9 @@ void Lyubu::init()
 	
 }
 
-
+bool Lyubu::Isdead(){
+	return (blood <= 0);
+}
 
 void Lyubu::changeState(BYTE code, BOOL value)
 {
@@ -168,7 +170,8 @@ void Lyubu::changeState(BYTE code, BOOL value)
 					state.remove(LYUBU_RIGHT);
 				break;
 		}
-		MakeAction();
+		if(!state.contain(LYUBU_HITTED))
+			MakeAction();
 	}
 
 	
@@ -541,6 +544,22 @@ void Lyubu::AttackFunction(int skip)
 	}
 }
 
+void Lyubu::HittedFunction(int skip)
+{
+	BOOL flag = this->Play(0, ONCE, (float)skip, FALSE, TRUE);
+
+	if(flag == FALSE)
+	{
+		this->state.remove(LYUBU_HITTED);
+		MakeAction();
+	}
+}
+
+void Lyubu::DieFunction(int skip)
+{
+	this->Play(0, ONCE, (float)skip, FALSE, TRUE);
+}
+
 void Lyubu::turn()
 {
 	FnCamera camera;
@@ -568,4 +587,42 @@ void Lyubu::turn()
 		bb.RollTo(angle);
 	else
 		bb.RollTo(360-angle);
+}
+
+void Lyubu::hit(int damage)
+{
+	this->state.remove(LYUBU_ATT);
+	this->blood -= damage;
+	FnBillBoard bb;
+	bb.Object(this->bloodID, this->blood_billboardID);
+	float size[2];
+	size[0] = 3.0f*blood;
+	size[1] = 5.0f;
+	bb.SetSize(size);
+
+	this->state.add(LYUBU_HITTED);
+	if(this->blood>0)
+	{
+		this->MakeCurrentAction(0, NULL, this->hittedID);
+		this->curActID = this->hittedID;
+		this->Play(0, START, 0.0f, FALSE, TRUE);
+		this->nextFrame = &Lyubu::HittedFunction;
+	}
+	else
+	{
+		this->MakeCurrentAction(0, NULL, this->dieID);
+		this->curActID = this->dieID;
+		this->Play(0, START, 0.0f, FALSE, TRUE);
+		this->nextFrame = &Lyubu::DieFunction;
+	}
+}
+
+int Lyubu::getState()
+{
+	return this->state.get();
+}
+
+float Lyubu::getBlood()
+{
+	return this->blood;
 }
