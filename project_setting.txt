@@ -13,3 +13,8 @@ DirectX_SDK\Lib\x86";TheFly\Lib
 Link:
 
 d3d9.lib d3dx9.lib dsound.lib dxguid.lib winmm.lib dinput8.lib TheFlyLib.lib
+
+
+Link:
+
+amstrmid.lib
