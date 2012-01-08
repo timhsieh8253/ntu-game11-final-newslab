@@ -1,11 +1,13 @@
 #include "Lyubu.h"
 #include "utils.h"
+#include "FX.h"
 
 #include <queue>
 
 using namespace std;
 
 extern MyAttackQueue AttackList;
+extern FX *fx;
 
 Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : FnActor()
 {
@@ -116,6 +118,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 			case FY_J:
 				if(value)
 				{
+					fx->Attack1("lyubu_attack", *this);
 					state.add(LYUBU_ATT);
 					curAttID = nAtt1ID;
 				}
@@ -123,6 +126,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 			case FY_K:
 				if(value)
 				{
+					fx->Attack2("lyubu_attack", *this);
 					state.add(LYUBU_ATT);
 					curAttID = nAtt2ID;
 				}
@@ -137,6 +141,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 			case FY_I:
 				if(value)
 				{
+					fx->Attack4("lyubu_attack", *this);
 					state.add(LYUBU_ATT);
 					curAttID = nAtt4ID;
 				}
@@ -543,6 +548,7 @@ void Lyubu::AttackFunction(int skip)
 	if(flag == FALSE)
 	{
 		this->state.remove(LYUBU_ATT);
+		fx->Delete("lyubu_attack");
 		MakeAction();
 	}
 }
@@ -554,6 +560,7 @@ void Lyubu::HittedFunction(int skip)
 	if(flag == FALSE)
 	{
 		this->state.remove(LYUBU_HITTED);
+		fx->Delete("lyubu_damage");
 		MakeAction();
 	}
 }
@@ -610,6 +617,7 @@ void Lyubu::hit(int damage)
 		this->curActID = this->hittedID;
 		this->Play(0, START, 0.0f, FALSE, TRUE);
 		this->nextFrame = &Lyubu::HittedFunction;
+		fx->Damage1("lyubu_damage", *this);
 	}
 	else
 	{

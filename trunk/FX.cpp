@@ -76,6 +76,33 @@ void FX::Damage1(char* key, FnActor actor)
 	AddFX(newfx, pos, key, actor);
 }
 
+void FX::Damage2(char* key, FnActor actor)
+{
+	float pos[3] = {0.f, 0.f, 50.f};
+	eF3DFX *newfx = new eF3DFX(sID);
+	newfx->SetWorkPath("NTU4\\FXs");
+	newfx->Load("Hurt2");
+	AddFX(newfx, pos, key, actor);
+}
+
+void FX::Defense1(char* key, FnActor actor)
+{
+	float pos[3] = {0.f, 0.f, 50.f};
+	eF3DFX *newfx = new eF3DFX(sID);
+	newfx->SetWorkPath("NTU4\\FXs");
+	newfx->Load("Defense");
+	AddFX(newfx, pos, key, actor);
+}
+
+void FX::Defense2(char* key, FnActor actor)
+{
+	float pos[3] = {0.f, 0.f, 50.f};
+	eF3DFX *newfx = new eF3DFX(sID);
+	newfx->SetWorkPath("NTU4\\FXs");
+	newfx->Load("Defense04");
+	AddFX(newfx, pos, key, actor);
+}
+
 void FX::Eat(char* key, FnActor actor)
 {
 	float pos[3] = {0.f, 0.f, 50.f};

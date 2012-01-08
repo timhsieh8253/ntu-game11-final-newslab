@@ -19,6 +19,8 @@ class FX
 		void Attack4(char* key, FnActor actor);
 		void Damage1(char* key, FnActor actor);
 		void Damage2(char* key, FnActor actor);
+		void Defense1(char* key, FnActor actor);
+		void Defense2(char* key, FnActor actor);
 		void Eat(char* key, FnActor actor);
 		void Heal(char* key, FnActor actor); //play NoPigeon
 		void Play(float skip);

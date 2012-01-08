@@ -1,9 +1,9 @@
 #include "TheFlyWin32.h"
-#include "FyFX.h"
 #include "FyMedia.h"
 #include "utils.h"
 #include "npc.h"
 #include "Lyubu.h"
+#include "FX.h"
 
 #include <queue>
 #include <vector>
@@ -17,8 +17,7 @@ SCENEid sID;
 OBJECTid cID, tID, lID, lyubuID, minimap_cID, arrowID;
 int billboardID;
 ACTIONid curActID, idleID, runID, att1ID, att2ID, att3ID, att4ID;
-eF3DFX *fx00;//FX
-eF3DBaseFX *fx;
+FX *fx;
 
 NPC Donzo;
 Lyubu *lyubu;
@@ -167,21 +166,7 @@ int main(int argc, char **argv)
 	Donzo.Play(0, START, 0.0f, FALSE, TRUE);
 
 	//FX
-	/*
-	fx00 = new eF3DFX(sID);
-	fx00->SetWorkPath("NTU4\\FXs");
-	fx00->Load("NoPigeon1");
-	
-	//pos[0] = 0.f;
-	//pos[1] = 0.f;
-	pos[2] = 100.f;
-	for(int i=0; i<fx00->NumberFXs(); i++)
-	{
-		fx = fx00->GetFX(i);
-		//fx->SetParent(lyubu->GetBaseObject());
-		fx->InitPosition(pos);
-	}
-	*/
+	fx = new FX(sID);
 
 	// Room
 	OBJECTid roomID = scene.CreateRoom(COLLISION_ROOM, 100);
@@ -303,8 +288,7 @@ void GameAI(int skip)
 	lyubu->GetPosition(pos);
 	pos[2] = 5000;
 	camera.SetPosition(pos);
-	/*if(!fx00->Play((float) skip))
-		fx00->Reset();*/
+	fx->Play((float) skip);
 	return ;
 }
 
