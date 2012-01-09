@@ -66,7 +66,7 @@ void Lyubu::init()
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
 
-	size[0] = this->blood*3;
+	size[0] = this->blood*1;
 	size[1] = 5.0f;
 	//pos[0]-=fullblood-size[0];
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
@@ -606,14 +606,11 @@ void Lyubu::turn()
 
 void Lyubu::hit(int damage)
 {
+	fx->Delete("lyubu_attack");
 	this->state.remove(LYUBU_ATT);
 	this->blood -= damage;
-	FnBillBoard bb;
-	bb.Object(this->bloodID, this->blood_billboardID);
-	float size[2];
-	size[0] = 3.0f*blood;
-	size[1] = 5.0f;
-	bb.SetSize(size);
+	redrawBloodBar();
+	
 
 	this->state.add(LYUBU_HITTED);
 	if(this->blood>0)
@@ -641,4 +638,20 @@ int Lyubu::getState()
 float Lyubu::getBlood()
 {
 	return this->blood;
+}
+
+void Lyubu::addBlood(float amount)
+{
+	this->blood += amount;
+	this->redrawBloodBar();
+}
+
+void Lyubu::redrawBloodBar()
+{
+	FnBillBoard bb;
+	bb.Object(this->bloodID, this->blood_billboardID);
+	float size[2];
+	size[0] = 1.0f*blood;
+	size[1] = 5.0f;
+	bb.SetSize(size);
 }
