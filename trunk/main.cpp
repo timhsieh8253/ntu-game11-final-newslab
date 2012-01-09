@@ -213,6 +213,7 @@ int main(int argc, char **argv)
 
 	
 	
+
 	
 
 
@@ -304,6 +305,32 @@ void GameAI(int skip)
 	if(temp==0 && !audio5.IsPlaying()){
 		mP.Stop();
 		audio5.Play(0);
+
+		// victory pic
+		FnScene scene;
+		scene.Object(sID);
+		FnWorld gw;
+		gw.Object(gID);
+		OBJECTid vicID = scene.CreateObject(ROOT);
+		FnObject vic;
+		vic.Object(vicID);
+		FnCamera camera;
+		camera.Object(cID);
+		float vic_pos[3];
+		float tmp[3];
+		camera.GetDirection(vic_pos, tmp);
+		FVector::Scale(vic_pos, 500, vic_pos);
+		float vic_size[2] = {256.0f, 256.0f};
+		
+		gw.SetTexturePath("NTU4\\Characters");
+		int vic_billboardID = vic.Billboard(vic_pos, vic_size, "victory", 0, NULL);
+
+		FnBillBoard bb;
+
+		bb.Object(vicID, vic_billboardID);
+		vic.SetParent(cID);
+		vic.ChangeRenderGroup(1);
+		
 	}
 
 	AttackList.reduceDelay(skip);
@@ -319,7 +346,7 @@ void GameAI(int skip)
 			AttackList.pop();
 
 			// 呂布砍人
-			if(ae.actor == lyubu)
+			if(ae.actor == lyubu && !lyubu->Isdead())
 			{
 				
 				// 檢查每個 NPC 有沒有被砍
@@ -357,7 +384,7 @@ void GameAI(int skip)
 				}
 			}
 			// 呂布被砍
-			else
+			else if(ae.actor != lyubu)
 			{
 				lyubu->hit(ae.damage);
 				if(lyubu->Isdead())

@@ -137,6 +137,7 @@ void NPC::changeState(int newState, int Level){
 							 this->hitLevel = Level; 
 							 hitNum++;
 							 this->action=&NPC::hittedAction;
+							 decreaseLife(hitLevel);
 							 break;
 		default:    		 ;
 	}
@@ -330,12 +331,12 @@ void NPC::attackAction()
 void NPC::hittedAction()
 {
 	FnBillBoard bb;
-	if(actor == 0){
+	/*if(actor == 0){
 		if(curActID != damageID && curActID != defanceID) decreaseLife(hitLevel);
 	}
 	else{
 		if(curActID != damageID) decreaseLife(hitLevel);
-	}
+	}*/
 	
 	bb.Object(this->bloodID, this->blood_billboardID);
 	float size[2];
