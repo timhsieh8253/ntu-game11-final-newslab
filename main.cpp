@@ -28,8 +28,8 @@ HWND hwnd,End;
 MEDIAid mmID,endID;
 FnMedia mP,endP;
 AUDIOid audioID;
-FnAudio audio1,audio2,audio3,audio4;
-BOOL A1,A2,A3,A4;
+FnAudio audio1,audio2,audio3,audio4,audio5;
+BOOL A1,A2,A3,A4,A5;
 
 State walk_state;
 int turn_state;
@@ -280,6 +280,9 @@ int main(int argc, char **argv)
 	audioID = gw.CreateAudio();
     audio4.Object(audioID);
     A4 = audio4.Load("01_pose07");
+	audioID = gw.CreateAudio();
+    audio5.Object(audioID);
+    A5 = audio5.Load("General01");
 
 	mP.Play(LOOP);
 	FyInvokeTheFly(TRUE);
@@ -291,9 +294,18 @@ int main(int argc, char **argv)
 void GameAI(int skip)
 {
 	(lyubu->*(lyubu->nextFrame))(skip); // 很複雜的 Function 指標 囧 不過可以省下 if else
-	int i, num = NPCs.size();
-	for(i=0;i<num;i++)
+	int i,temp,num = NPCs.size();
+	temp=num;
+	for(i=0;i<num;i++){
 		NPCs[i]->fsm(skip);
+		if(NPCs[i]->Isdead())
+			temp--;
+	}
+	if(temp==0 && !audio5.IsPlaying()){
+		mP.Stop();
+		audio5.Play(0);
+	}
+
 	AttackList.reduceDelay(skip);
 
 	// 有 Attack Event
