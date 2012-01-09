@@ -19,6 +19,7 @@ public:
 	bool Isdead();
 	int getState();
 	float getBlood();
+	void addBlood(float amount);
 	
 	void (Lyubu::*nextFrame)(int skip);
 private:
@@ -44,4 +45,5 @@ private:
 	void DieFunction(int);
 	void MakeAction();
 	void turn();
+	void redrawBloodBar();
 };

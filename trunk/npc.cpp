@@ -131,7 +131,7 @@ void NPC::changeState(int newState, int Level){
 							 break;
 
 		//case escape:		 this->state = escape;			break;
-		case die:			 this->state = die;				this->action=&NPC::dieAction;		break;
+		case die:			 this->state = die;				this->action=&NPC::dieAction;	lyubu->addBlood(10);	break;
 		case hitted:
 							 this->state = hitted;
 							 this->hitLevel = Level; 
