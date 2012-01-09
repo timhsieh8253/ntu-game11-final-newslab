@@ -16,7 +16,7 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 	this->terrainID = tid;
 	this->arrowID = aid;
 	this->arrow_billboardID = bid;
-	this->minHeight = 600.0f;
+	this->minHeight = 500.0f;
 	this->maxDistance = 1000.0f;
 	this->blood = 50.0f;
 	this->selfID = id;
@@ -25,8 +25,11 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 void Lyubu::init()
 {
 
-	float pos[3] = {3569.0f, -3208.0f, 0.f};
+	float pos[3] = {3650.0f, -3345.0f, 0.f};
+	float fdir[3] = {0.0f, 1.0f, 0.0f}, udir[3] = {0.0f, 0.0f, 1.0f};
 	this->SetPosition(pos);
+	this->SetDirection(fdir, udir);
+	this->TurnRight(340);
 
 	if(!this->PutOnTerrain(terrainID, FALSE, 0.0f))
 	   exit(1);

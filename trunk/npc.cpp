@@ -232,7 +232,7 @@ void NPC::waitAction()
 	this->GetPosition(pos);
 	lyubu->GetPosition(lyubu_pos);
 
-	float follow_dis = 1000;
+	float follow_dis = 500;
 	float attack_dis = 100;
 	float dis = FVector::ComputeDistance(lyubu_pos, pos);
 
@@ -258,7 +258,7 @@ void NPC::followAction()
 	this->GetPosition(pos);
 	lyubu->GetPosition(lyubu_pos);
 
-	float follow_dis = 1000;
+	float follow_dis = 500;
 	float attack_dis = 100;
 	float dis = FVector::ComputeDistance(lyubu_pos, pos);
 
