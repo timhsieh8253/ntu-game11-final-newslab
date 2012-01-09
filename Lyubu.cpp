@@ -146,7 +146,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 			case FY_I:
 				if(value)
 				{
-					fx->Attack4("lyubu_attack", *this);
+					fx->Attack4("lyubu_attack2", *this);
 					state.add(LYUBU_ATT);
 					curAttID = nAtt4ID;
 				}

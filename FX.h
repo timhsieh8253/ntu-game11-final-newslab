@@ -26,6 +26,7 @@ class FX
 		void Play(float skip);
 		void Delete(char* key);
 	private:
+		string at;
 		SCENEid sID;
 		map<string, eF3DFX*> playlist;
 		map<string, eF3DFX*>::iterator iter;
