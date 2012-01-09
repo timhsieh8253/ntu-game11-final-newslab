@@ -22,6 +22,7 @@ FX *fx;
 NPC Donzo;
 Lyubu *lyubu;
 OBJECTid DonzoID;
+FnRoom room;
 
 HWND hwnd,End;
 MEDIAid mmID,endID;
@@ -151,36 +152,58 @@ int main(int argc, char **argv)
 	// Camera
 	cID = scene.CreateCamera(ROOT);
 
+	// Room
+	OBJECTid roomID = scene.CreateRoom(COLLISION_ROOM, 100);
+	
+	room.Object(roomID);
+
 	// Lyubu
 
 	OBJECTid lyubuID = scene.LoadActor("Lyubu");
 	lyubu = new Lyubu(lyubuID, cID, tID, arrowID, billboardID);
 	lyubu->Object(lyubuID);
 	lyubu->init();
+	room.AddEntity(lyubuID);
 
+	
 	// Load Donzo
 	DonzoID = scene.LoadActor("Donzo");
 	NPCs.push_back(&Donzo);
 	Donzo.init(DonzoID, 0, cID);
+	room.AddEntity(DonzoID);
 
-	float pos[3] = {3569.0f, -3208.0f, 0.f};
-	pos[0] = 3800.0f;
+	float pos[3] = {-1206.0f, -2880.0f, 0.f};
 	Donzo.SetPosition(pos);
 	Donzo.TurnRight(37);
 
 	if(!Donzo.PutOnTerrain(tID, FALSE, 0.0f))
 	   exit(1);
 
-	// Load Robber
+	
+	// Load Robber1
 	OBJECTid RobberID = scene.LoadActor("Robber02");
 	NPC *robber = new NPC();
 	NPCs.push_back(robber);
 	robber->init(RobberID, 1, cID);
 
-	pos[0] = 3454.f;
-	pos[1] = -3874.f;
-	pos[2] = 100.0f;
+	pos[0] = 3425.f;
+	pos[1] = -2755.f;
 	robber->SetPosition(pos);
+	room.AddEntity(RobberID);
+
+	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
+	   exit(3);
+
+	// Load Robber2
+	RobberID = scene.LoadActor("Robber02");
+	robber = new NPC();
+	NPCs.push_back(robber);
+	robber->init(RobberID, 1, cID);
+
+	pos[0] = 785.f;
+	pos[1] = -2170.f;
+	robber->SetPosition(pos);
+	room.AddEntity(RobberID);
 
 	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
 	   exit(3);
@@ -188,12 +211,9 @@ int main(int argc, char **argv)
 	//FX
 	fx = new FX(sID);
 
-	// Room
-	OBJECTid roomID = scene.CreateRoom(COLLISION_ROOM, 100);
-	FnRoom room;
-	room.Object(roomID);
-	room.AddEntity(lyubuID);
-	room.AddEntity(DonzoID);
+	
+	
+	
 
 
 	// Light
@@ -320,6 +340,8 @@ void GameAI(int skip)
 							}
 						}
 					}
+					else
+						room.RemoveEntity(npc->getid());
 				}
 			}
 			// §f¥¬³Q¬å
