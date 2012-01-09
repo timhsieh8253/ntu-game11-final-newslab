@@ -27,6 +27,7 @@ NPC::~NPC(){
 
 bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 {
+		
 	npc_id  = id;
 	actor   = actorType;
 	Object(npc_id);
@@ -35,13 +36,28 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 	nextActID = idleID;
 	MakeCurrentAction(0, NULL, idleID);
 	flag = TRUE;
-	life = 20;
 	hitLevel = 0;
 	attackLevel = 0;
 	hitNum = 0;
 	test = 0;
 	cd = MAX_CD;
-
+	
+	if(actor==0){	// Donzo 
+		ae.actor = this;
+		ae.length = 150;
+		ae.width = 50;
+		ae.damage = 4;
+		ae.delay = 20;
+		life=80;
+	}
+	else{
+		ae.actor = this;
+		ae.length = 50;
+		ae.width = 30;
+		ae.damage = 2;
+		ae.delay = 15;
+		life=40;
+	}
 	this->runState.set(NPC_IDLE);
 	this->nextRunState.set(NPC_IDLE);
 	this->cameraID = cameraid;
@@ -221,18 +237,12 @@ void NPC::waitAction()
 	float dis = FVector::ComputeDistance(lyubu_pos, pos);
 
 	//檢查和呂布的距離，小於限制就變 follow
-	if(dis < attack_dis && !lyubu->Isdead())
+	if(dis < attack_dis && !lyubu->Isdead() ) 
 	{
 		if(cd >= MAX_CD)
 		{
 			cd = 0;
-			this->changeState(attackPlayer, 1);
-			AttackEvent ae;
-			ae.actor = this;
-			ae.length = 150;
-			ae.width = 50;
-			ae.damage = 2;
-			ae.delay = 15;
+			this->changeState(attackPlayer, 1);			
 			AttackList.push(ae);
 		}
 	}

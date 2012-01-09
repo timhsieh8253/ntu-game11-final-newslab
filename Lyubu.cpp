@@ -18,7 +18,7 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 	this->arrow_billboardID = bid;
 	this->minHeight = 600.0f;
 	this->maxDistance = 1000.0f;
-	this->blood = 30.0f;
+	this->blood = 50.0f;
 	this->selfID = id;
 }
 
@@ -122,6 +122,7 @@ void Lyubu::changeState(BYTE code, BOOL value)
 					fx->Attack1("lyubu_attack", *this);
 					state.add(LYUBU_ATT);
 					curAttID = nAtt1ID;
+
 				}
 				break;
 			case FY_K:
