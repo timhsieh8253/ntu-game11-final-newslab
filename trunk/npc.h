@@ -40,7 +40,7 @@ public:
 
 
 private:
-
+	AttackEvent ae;
 	OBJECTid npc_id, cameraID;
 	ACTIONid curActID, nextActID;
 	ACTIONid idleID,   runID,    move_rightID,   move_leftID;
