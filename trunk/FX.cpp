@@ -22,6 +22,7 @@ char *newfxname[] = {"Attack01",
 FX::FX(SCENEid sID)
 {
 	this->sID = sID;
+	at = string("lyubu_attack2");
 }
 
 void FX::NewFX(char* fxname, float pos[3], char* key)
@@ -60,11 +61,19 @@ void FX::Attack2(char* key, FnActor actor)
 
 void FX::Attack4(char* key, FnActor actor)
 {
-	float pos[3] = {0.f, -125.f, 50.f};
-	eF3DFX *newfx = new eF3DFX(sID);
-	newfx->SetWorkPath("NTU4\\FXs");
-	newfx->Load("Pose13");
-	AddFX(newfx, pos, key, actor);
+	iter = playlist.find(at);
+	if(iter != playlist.end())
+	{
+		iter->second->Reset();
+	}
+	else
+	{
+		float pos[3] = {0.f, -125.f, 50.f};
+		eF3DFX *newfx = new eF3DFX(sID);
+		newfx->SetWorkPath("NTU4\\FXs");
+		newfx->Load("Pose13");
+		AddFX(newfx, pos, key, actor);
+	}
 }
 
 void FX::Damage1(char* key, FnActor actor)
@@ -161,7 +170,9 @@ void FX::Play(float skip)
 {
 	for(iter = playlist.begin(); iter != playlist.end(); iter++)
 	{
-		if(!(iter->second->Play(skip)))
+		if(!(iter->second->Play(skip)) && iter->first != at)
+		{
 			iter->second->Reset();
+		}
 	}
 }
