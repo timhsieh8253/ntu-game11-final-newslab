@@ -234,7 +234,7 @@ void Lyubu::MakeAction()
 			{
 				ae.length = 150;
 				ae.width = 30;
-				ae.damage = 1;
+				ae.damage = 10;
 				ae.delay = 7;
 			}
 			else if(curAttID == nAtt4ID)
@@ -573,6 +573,7 @@ void Lyubu::HittedFunction(int skip)
 void Lyubu::DieFunction(int skip)
 {
 	this->Play(0, ONCE, (float)skip, FALSE, TRUE);
+	fx->Delete("lyubu_attack");
 }
 
 void Lyubu::turn()
@@ -606,7 +607,7 @@ void Lyubu::turn()
 
 void Lyubu::hit(int damage)
 {
-	fx->Delete("lyubu_attack");
+	
 	this->state.remove(LYUBU_ATT);
 	this->blood -= damage;
 
@@ -629,6 +630,7 @@ void Lyubu::hit(int damage)
 		this->Play(0, START, 0.0f, FALSE, TRUE);
 		this->nextFrame = &Lyubu::DieFunction;
 	}
+	fx->Delete("lyubu_attack");
 }
 
 int Lyubu::getState()
