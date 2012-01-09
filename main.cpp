@@ -327,7 +327,12 @@ void GameAI(int skip)
 			{
 				lyubu->hit(ae.damage);
 				if(lyubu->Isdead())
+				{
 					audio2.Play(0);
+					mP.Stop();
+					endP.Object(endID);
+					endP.Play(ONCE);
+				}
 				else
 					audio1.Play(0);
 			}
@@ -340,12 +345,6 @@ void GameAI(int skip)
 	lyubu->GetPosition(pos);
 	pos[2] = 5000;
 	camera.SetPosition(pos);
-
-	if(lyubu->getBlood()<=0){
-		mP.Stop();
-		endP.Object(endID);
-		endP.Play(ONCE);
-	}
 
 	/*if(!fx00->Play((float) skip))
 		fx00->Reset();*/
