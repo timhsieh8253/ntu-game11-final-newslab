@@ -18,7 +18,7 @@ Lyubu::Lyubu(OBJECTid id, OBJECTid cid, OBJECTid tid, OBJECTid aid, int bid) : F
 	this->arrow_billboardID = bid;
 	this->minHeight = 500.0f;
 	this->maxDistance = 1000.0f;
-	this->blood = 50.0f;
+	this->blood = 40.0f;
 	this->selfID = id;
 }
 
@@ -609,6 +609,7 @@ void Lyubu::hit(int damage)
 	fx->Delete("lyubu_attack");
 	this->state.remove(LYUBU_ATT);
 	this->blood -= damage;
+
 	redrawBloodBar();
 	
 
