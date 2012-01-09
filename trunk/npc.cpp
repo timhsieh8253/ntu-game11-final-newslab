@@ -6,7 +6,7 @@
 
 #include <queue>
 
-#define MAX_CD 60
+#define MAX_CD 90
 
 using namespace std;
 
@@ -48,7 +48,7 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 		ae.width = 50;
 		ae.damage = 4;
 		ae.delay = 20;
-		life=80;
+		life=50;
 	}
 	else{
 		ae.actor = this;
@@ -56,7 +56,7 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 		ae.width = 30;
 		ae.damage = 2;
 		ae.delay = 15;
-		life=40;
+		life=20;
 	}
 	this->runState.set(NPC_IDLE);
 	this->nextRunState.set(NPC_IDLE);
@@ -76,7 +76,7 @@ bool NPC::init(OBJECTid id, int actorType, OBJECTid cameraid)
 	pos[1] = 0.0f;
 	pos[2] = 100.0f;
 	
-	size[0] = 3.0f*life;
+	size[0] = 1.0f*life;
 	size[1] = 5.0f;
 	color[0] = 1.0f; color[1] = color[2] = 0.0f;
 	
@@ -339,7 +339,7 @@ void NPC::hittedAction()
 	
 	bb.Object(this->bloodID, this->blood_billboardID);
 	float size[2];
-	size[0] = 3.0f*life;
+	size[0] = 1.0f*life;
 	size[1] = 5.0f;
 	bb.SetSize(size);
 
