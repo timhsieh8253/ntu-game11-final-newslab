@@ -574,6 +574,7 @@ void Lyubu::DieFunction(int skip)
 {
 	this->Play(0, ONCE, (float)skip, FALSE, TRUE);
 	fx->Delete("lyubu_attack");
+	fx->Delete("lyubu_damage");
 }
 
 void Lyubu::turn()

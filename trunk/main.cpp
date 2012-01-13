@@ -49,6 +49,7 @@ void NPCKeydownAttack(WORLDid gID, BYTE code, BOOL value);
 void Keydown(WORLDid, BYTE, BOOL);
 void RenderFunc(int);
 void GameAI(int skip);
+void addRobber(float, float);
 
 
 
@@ -179,42 +180,17 @@ int main(int argc, char **argv)
 	if(!Donzo.PutOnTerrain(tID, FALSE, 0.0f))
 	   exit(1);
 
-	
-	// Load Robber1
-	OBJECTid RobberID = scene.LoadActor("Robber02");
-	NPC *robber = new NPC();
-	NPCs.push_back(robber);
-	robber->init(RobberID, 1, cID);
-
-	pos[0] = 3425.f;
-	pos[1] = -2755.f;
-	robber->SetPosition(pos);
-	room.AddEntity(RobberID);
-
-	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
-	   exit(3);
-
-	// Load Robber2
-	RobberID = scene.LoadActor("Robber02");
-	robber = new NPC();
-	NPCs.push_back(robber);
-	robber->init(RobberID, 1, cID);
-
-	pos[0] = 785.f;
-	pos[1] = -2170.f;
-	robber->SetPosition(pos);
-	room.AddEntity(RobberID);
-
-	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
-	   exit(3);
+	// load Robbers
+	addRobber(3425.f, -2755.f);
+	addRobber(3445.f, -2735.f);
+	addRobber(3435.f, -2715.f);
+	addRobber(3455.f, -2695.f);
+	addRobber(785.f, -2170.f);
+	addRobber(765.f, -2190.f);
+	addRobber(805.f, -2190.f);
 
 	//FX
 	fx = new FX(sID);
-
-	
-	
-
-	
 
 
 	// Light
@@ -290,6 +266,28 @@ int main(int argc, char **argv)
 	
 
 	return 0;
+}
+
+void addRobber(float x, float y)
+{
+	FnScene scene;
+	scene.Object(sID);
+	OBJECTid RobberID = scene.LoadActor("Robber02");
+	if(RobberID == FAILED_ID)
+		exit(31);
+	NPC *robber = new NPC();
+	NPCs.push_back(robber);
+	robber->init(RobberID, 1, cID);
+
+	float pos[3];
+	pos[0] = x;
+	pos[1] = y;
+	pos[2] = 0.0f;
+	robber->SetPosition(pos);
+	room.AddEntity(RobberID);
+
+	if(!robber->PutOnTerrain(tID, FALSE, 0.0f))
+	   exit(32);
 }
 
 void GameAI(int skip)
@@ -474,10 +472,10 @@ void RenderFunc(int skip)
 	sprintf(msg, "NPC: state = %d, life = %d, curaction = %d", Donzo.getState(), Donzo.getlife(), Donzo.getcurAction());
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);*/
 
-	sprintf(msg, "npc: %d  State:%d  Life = %d", Donzo.getTest(), Donzo.getState(), Donzo.getlife());
+	/*sprintf(msg, "npc: %d  State:%d  Life = %d", Donzo.getTest(), Donzo.getState(), Donzo.getlife());
 	gw.MessageOnScreen(10, 10, msg, 255, 255, 255);
 	sprintf(msg, "State:%d Blood = %.0f Pos: %f %f\n", lyubu->getState(), lyubu->getBlood(), lpos[0], lpos[1]);
-	gw.MessageOnScreen(10, 30, msg, 255, 255, 255);
+	gw.MessageOnScreen(10, 30, msg, 255, 255, 255);*/
 
 	float output[2], input[3];
 	Donzo.GetPosition(input);
