@@ -293,7 +293,9 @@ void NPC::followAction()
 
 	setNPCurAction(run,"");
 	
-	this->MoveForward(5, TRUE, TRUE, 0, TRUE);
+	int status = this->MoveForward(5, TRUE, TRUE, 0, TRUE);
+	if(status < 0)
+		this->MoveRight(10);
 }
 
 void NPC::attackAction()
